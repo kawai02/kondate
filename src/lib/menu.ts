@@ -10,7 +10,7 @@ export async function listMenuEntries(
   const { data, error } = await supabase
     .from("menu_entries")
     .select(
-      "id, date, meal_type, recipe_id, servings, position, note, recipe:recipes(id, title, tags, base_servings, cook_time_min)"
+      "id, date, meal_type, recipe_id, servings, position, note, recipe:recipes(id, title, tags, base_servings, cook_time_min, thumbnail_url)"
     )
     .gte("date", startDate)
     .lte("date", endDate)

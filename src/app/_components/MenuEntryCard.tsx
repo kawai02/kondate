@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { deleteMenuEntryAction, moveMenuEntryAction } from "@/lib/menu-actions";
 import type { MenuEntryWithRecipe } from "@/lib/types";
 
@@ -15,13 +16,28 @@ export function MenuEntryCard({
 
   return (
     <div className="flex items-center gap-2 rounded-xl border border-black/10 p-3 dark:border-white/10">
-      <Link href={`/recipes/${entry.recipe.id}`} className="min-w-0 flex-1">
-        <p className="truncate font-medium">{entry.recipe.title}</p>
-        <div className="mt-0.5 flex flex-wrap gap-2 text-xs text-black/50 dark:text-white/50">
-          {servings != null && <span>{servings}人前</span>}
-          {entry.recipe.tags.slice(0, 2).map((tag) => (
-            <span key={tag}>#{tag}</span>
-          ))}
+      <Link href={`/recipes/${entry.recipe.id}`} className="flex min-w-0 flex-1 items-center gap-3">
+        {entry.recipe.thumbnail_url ? (
+          <Image
+            src={entry.recipe.thumbnail_url}
+            alt=""
+            width={112}
+            height={64}
+            className="h-14 w-20 shrink-0 rounded-lg object-cover"
+          />
+        ) : (
+          <div className="flex h-14 w-20 shrink-0 items-center justify-center rounded-lg bg-black/5 text-xl dark:bg-white/10">
+            🍽
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-medium">{entry.recipe.title}</p>
+          <div className="mt-0.5 flex flex-wrap gap-2 text-xs text-black/50 dark:text-white/50">
+            {servings != null && <span>{servings}人前</span>}
+            {entry.recipe.tags.slice(0, 2).map((tag) => (
+              <span key={tag}>#{tag}</span>
+            ))}
+          </div>
         </div>
       </Link>
       <div className="flex shrink-0 items-center gap-1">

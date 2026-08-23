@@ -49,7 +49,10 @@ export type MenuEntry = {
 };
 
 export type MenuEntryWithRecipe = MenuEntry & {
-  recipe: Pick<Recipe, "id" | "title" | "tags" | "base_servings" | "cook_time_min">;
+  recipe: Pick<
+    Recipe,
+    "id" | "title" | "tags" | "base_servings" | "cook_time_min" | "thumbnail_url"
+  >;
 };
 
 export type RecipeSort = "new" | "cook_time" | "last_cooked";
