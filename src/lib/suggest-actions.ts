@@ -21,8 +21,11 @@ export type SuggestedDay = {
 
 type ActionResult<T> = { ok: true; data: T } | { ok: false; message: string };
 
+const MAX_EXTRA_INSTRUCTION_LENGTH = 500;
+
 export async function suggestWeeklyMenuAction(
-  startDate: string
+  startDate: string,
+  extraInstruction?: string
 ): Promise<ActionResult<SuggestedDay[]>> {
   await requireSession();
 
@@ -52,7 +55,12 @@ export async function suggestWeeklyMenuAction(
   });
 
   try {
-    const result = await suggestWeeklyMenu({ candidates, days });
+    const result = await suggestWeeklyMenu({
+      candidates,
+      days,
+      // 長すぎる入力でトークンを浪費しないよう上限で切り詰める。
+      extraInstruction: extraInstruction?.slice(0, MAX_EXTRA_INSTRUCTION_LENGTH),
+    });
 
     const suggestions: SuggestedDay[] = [];
     for (const assignment of result.assignments) {

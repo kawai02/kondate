@@ -285,6 +285,7 @@ export type WeeklyMenuDay = {
 export async function suggestWeeklyMenu(params: {
   candidates: WeeklyMenuCandidate[];
   days: WeeklyMenuDay[];
+  extraInstruction?: string;
 }): Promise<GeminiWeeklyMenuOutput> {
   const recipeList = params.candidates
     .map(
@@ -297,16 +298,27 @@ export async function suggestWeeklyMenu(params: {
     .map((d) => `${d.dayOffset}: ${d.date}（${d.weekday}${d.isWeekend ? "・週末" : ""}）`)
     .join("\n");
 
+  // ユーザーの追加要望は基本方針の後に置き、競合したときは要望を優先させる。
+  // レシピ一覧より前に置くことで、長いレシピ一覧に埋もれて無視されるのを防ぐ。
+  const extraSection = params.extraInstruction?.trim()
+    ? `
+
+今回の追加要望（上の方針と競合する場合はこちらを優先する）:
+${params.extraInstruction.trim()}`
+    : "";
+
   const prompt = `以下のレシピ一覧から、7日分の献立を1日1品ずつ選ぶ。
 
-厳守事項:
+基本方針:
 - 肉料理と魚料理が偏らないようにする。
 - 最終調理日が直近1ヶ月以内のレシピは避ける（未調理のものは優先候補にしてよい）。
 - 平日は調理時間が短いものを、週末は手の込んだものを優先する。
 - 同じレシピを週内で重複させない。
+
+出力の決まり（これは追加要望より優先する）:
 - day_offsetは0〜6の7日すべてに1件ずつ割り当てる。
-- recipe_indexはレシピ一覧の行頭の番号をそのまま使う。
-- reasonには、なぜその日にそのレシピを選んだかを一言で書く。
+- recipe_indexはレシピ一覧の行頭の番号をそのまま使う。実在する番号のみ使う。
+- reasonには、なぜその日にそのレシピを選んだかを一言で書く。${extraSection}
 
 レシピ一覧（番号: タイトル / タグ / 調理時間 / 最終調理日）:
 ${recipeList}

@@ -19,17 +19,31 @@ export function RecipePickerSheet({
 }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [pending, startTransition] = useTransition();
 
-  const filtered = recipes.filter((r) =>
-    r.title.toLowerCase().includes(q.toLowerCase())
+  // 登録済みレシピが実際に使っているタグだけを候補にする（空振りする選択肢を出さない）。
+  const tagOptions = Array.from(new Set(recipes.flatMap((r) => r.tags))).sort();
+
+  // タグはAND条件で絞り込む（レシピ一覧の絞り込みと同じ挙動に揃える）。
+  const filtered = recipes.filter(
+    (r) =>
+      r.title.toLowerCase().includes(q.toLowerCase()) &&
+      selectedTags.every((t) => r.tags.includes(t))
   );
+
+  function toggleTag(tag: string) {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  }
 
   function pick(recipeId: string) {
     startTransition(async () => {
       await onPick(recipeId);
       setOpen(false);
       setQ("");
+      setSelectedTags([]);
     });
   }
 
@@ -63,6 +77,35 @@ export function RecipePickerSheet({
               placeholder="レシピ名で検索"
               className="mb-3 h-11 w-full rounded-lg border border-black/20 px-3 text-base dark:border-white/20 dark:bg-transparent"
             />
+
+            {tagOptions.length > 0 && (
+              <div className="mb-3 flex flex-wrap gap-1.5">
+                {tagOptions.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => toggleTag(tag)}
+                    className={`h-8 rounded-full border px-3 text-xs ${
+                      selectedTags.includes(tag)
+                        ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
+                        : "border-black/20 dark:border-white/20"
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+                {selectedTags.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedTags([])}
+                    className="h-8 px-2 text-xs text-black/50 underline dark:text-white/50"
+                  >
+                    クリア
+                  </button>
+                )}
+              </div>
+            )}
+
             <ul className="space-y-1">
               {filtered.map((r) => (
                 <li key={r.id}>

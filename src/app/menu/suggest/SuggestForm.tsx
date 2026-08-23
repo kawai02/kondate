@@ -26,6 +26,7 @@ export function SuggestForm({
   pickerRecipes: { id: string; title: string; tags: string[] }[];
 }) {
   const [startDate, setStartDate] = useState(today());
+  const [extraInstruction, setExtraInstruction] = useState("");
   const [suggestions, setSuggestions] = useState<SuggestedDay[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -36,7 +37,7 @@ export function SuggestForm({
   function handleSuggest() {
     setError(null);
     startTransition(async () => {
-      const result = await suggestWeeklyMenuAction(startDate);
+      const result = await suggestWeeklyMenuAction(startDate, extraInstruction);
       if (!result.ok) {
         setError(result.message);
         return;
@@ -87,6 +88,25 @@ export function SuggestForm({
             className="h-11 rounded-lg border border-black/20 px-3 text-base dark:border-white/20 dark:bg-transparent"
           />
         </div>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-medium" htmlFor="extra-instruction">
+            リクエスト（任意）
+          </label>
+          <textarea
+            id="extra-instruction"
+            value={extraInstruction}
+            onChange={(e) => setExtraInstruction(e.target.value)}
+            rows={3}
+            maxLength={500}
+            placeholder="例: 今週は野菜多めで。金曜は来客があるので豪華に。麺類は避けて。"
+            className="w-full rounded-lg border border-black/20 px-3 py-2 text-base dark:border-white/20 dark:bg-transparent"
+          />
+          <p className="text-xs text-black/50 dark:text-white/50">
+            AIは「肉と魚を偏らせない」「最近作ったものを避ける」「平日は時短・週末は手の込んだもの」を基本方針にする。ここに書いた要望はそれより優先される。
+          </p>
+        </div>
+
         {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
         <button
           type="button"
