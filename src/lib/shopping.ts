@@ -1,6 +1,6 @@
 import "server-only";
 import { getSupabase } from "@/lib/supabase";
-import { listMenuEntries } from "@/lib/menu";
+import { listMenuEntriesWithIngredients } from "@/lib/menu";
 import { scaleIngredients } from "@/lib/scaling";
 import { normalizeIngredientNames } from "@/lib/gemini";
 import type { Ingredient, ShoppingCategory, ShoppingItem, ShoppingList } from "@/lib/types";
@@ -13,29 +13,22 @@ async function expandIngredientsForRange(
   startDate: string,
   endDate: string
 ): Promise<ExpandedIngredient[]> {
-  const entries = await listMenuEntries(startDate, endDate);
+  // 献立とレシピのingredientsを1回のjoinでまとめて取得する
+  // （従来は献立取得後にrecipesをin()で引き直す2回目の往復があった）。
+  const entries = await listMenuEntriesWithIngredients(startDate, endDate);
   if (entries.length === 0) return [];
-
-  const recipeIds = Array.from(new Set(entries.map((e) => e.recipe_id)));
-  const supabase = getSupabase();
-  const { data: recipeRows, error } = await supabase
-    .from("recipes")
-    .select("id, ingredients, base_servings")
-    .in("id", recipeIds);
-  if (error) throw error;
-
-  const recipeMap = new Map((recipeRows ?? []).map((r) => [r.id, r]));
 
   const expanded: ExpandedIngredient[] = [];
   for (const entry of entries) {
-    const recipe = recipeMap.get(entry.recipe_id);
+    const recipe = entry.recipe;
     if (!recipe) continue;
 
     const targetServings = entry.servings ?? recipe.base_servings;
+    const recipeIngredients = recipe.ingredients as Ingredient[];
     const ingredients =
       recipe.base_servings != null && targetServings != null
-        ? scaleIngredients(recipe.ingredients as Ingredient[], recipe.base_servings, targetServings)
-        : (recipe.ingredients as Ingredient[]);
+        ? scaleIngredients(recipeIngredients, recipe.base_servings, targetServings)
+        : recipeIngredients;
 
     for (const ing of ingredients) {
       expanded.push({
@@ -132,23 +125,22 @@ export async function generateShoppingList(
 
 export async function getLatestShoppingList(): Promise<ShoppingListWithItems | null> {
   const supabase = getSupabase();
-  const { data: list, error: listError } = await supabase
+  // list + items を1回の埋め込みselectで取得する（従来は2往復）。
+  const { data: list, error } = await supabase
     .from("shopping_lists")
-    .select("*")
+    .select("*, items:shopping_items(*)")
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (listError) throw listError;
+  if (error) throw error;
   if (!list) return null;
 
-  const { data: items, error: itemsError } = await supabase
-    .from("shopping_items")
-    .select("*")
-    .eq("list_id", list.id)
-    .order("category", { ascending: true });
-  if (itemsError) throw itemsError;
+  const { items, ...listFields } = list as ShoppingList & { items: ShoppingItem[] };
+  const sortedItems = [...(items ?? [])].sort((a, b) =>
+    (a.category ?? "").localeCompare(b.category ?? "")
+  );
 
-  return { ...(list as ShoppingList), items: (items ?? []) as ShoppingItem[] };
+  return { ...(listFields as ShoppingList), items: sortedItems };
 }
 
 export async function toggleShoppingItem(id: string, checked: boolean): Promise<void> {

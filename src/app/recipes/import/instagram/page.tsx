@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { listRecipes } from "@/lib/recipes";
+import { listAllTags } from "@/lib/recipes";
 import { InstagramImporter } from "@/app/recipes/import/instagram/InstagramImporter";
 
 // AI解析（Gemini構造化出力）がタイムアウトしないよう、
@@ -7,8 +7,7 @@ import { InstagramImporter } from "@/app/recipes/import/instagram/InstagramImpor
 export const maxDuration = 30;
 
 export default async function InstagramImportPage() {
-  const recipes = await listRecipes();
-  const existingTags = Array.from(new Set(recipes.flatMap((r) => r.tags)));
+  const existingTags = await listAllTags();
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-6">

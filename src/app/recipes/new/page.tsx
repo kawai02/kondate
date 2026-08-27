@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { RecipeForm } from "@/app/recipes/_components/RecipeForm";
 import { createRecipeAction } from "@/lib/recipe-actions";
-import { listRecipes } from "@/lib/recipes";
+import { listAllTags } from "@/lib/recipes";
 
 export default async function NewRecipePage() {
-  const recipes = await listRecipes();
-  const existingTags = Array.from(new Set(recipes.flatMap((r) => r.tags)));
+  const existingTags = await listAllTags();
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-6">

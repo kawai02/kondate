@@ -57,6 +57,13 @@ export type MenuEntryWithRecipe = MenuEntry & {
 
 export type RecipeSort = "new" | "cook_time" | "last_cooked";
 
+// 一覧・ピッカー・ドラッグパネル・AI提案など、全文（raw_text/ingredients/steps）が
+// 不要な画面向けの軽量版。listRecipeSummariesが返す。
+export type RecipeSummary = Pick<
+  Recipe,
+  "id" | "title" | "tags" | "cook_time_min" | "thumbnail_url" | "is_planned" | "created_at"
+>;
+
 export type CookingLog = {
   id: string;
   recipe_id: string;

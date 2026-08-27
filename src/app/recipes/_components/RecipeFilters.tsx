@@ -1,23 +1,53 @@
 "use client";
 
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { INITIAL_TAGS } from "@/lib/tags";
+
+const SEARCH_DEBOUNCE_MS = 300;
 
 export function RecipeFilters({ existingTags }: { existingTags: string[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [, startTransition] = useTransition();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const selectedTags = searchParams.getAll("tag");
-  const q = searchParams.get("q") ?? "";
   const sort = searchParams.get("sort") ?? "new";
   const planned = searchParams.get("planned") === "1";
 
-  const tagOptions = Array.from(new Set([...INITIAL_TAGS, ...existingTags]));
+  // 検索入力は1文字ごとに即遷移させると毎回ページ全体を再取得してしまうため、
+  // 見た目上の入力値はローカルstateで持ち、URL反映（サーバー往復）はデバウンスする。
+  const [qInput, setQInput] = useState(searchParams.get("q") ?? "");
+
+  const tagOptions = useMemo(
+    () => Array.from(new Set([...INITIAL_TAGS, ...existingTags])),
+    [existingTags]
+  );
 
   function updateParams(mutate: (params: URLSearchParams) => void) {
     const params = new URLSearchParams(searchParams.toString());
     mutate(params);
-    router.replace(`/recipes?${params.toString()}`);
+    startTransition(() => {
+      router.replace(`/recipes?${params.toString()}`);
+    });
+  }
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
+
+  function handleSearchChange(value: string) {
+    setQInput(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      updateParams((params) => {
+        if (value) params.set("q", value);
+        else params.delete("q");
+      });
+    }, SEARCH_DEBOUNCE_MS);
   }
 
   function toggleTag(tag: string) {
@@ -35,15 +65,9 @@ export function RecipeFilters({ existingTags }: { existingTags: string[] }) {
     <div className="space-y-3">
       <input
         type="search"
-        defaultValue={q}
+        value={qInput}
         placeholder="レシピ名・材料名で検索"
-        onChange={(e) => {
-          const value = e.target.value;
-          updateParams((params) => {
-            if (value) params.set("q", value);
-            else params.delete("q");
-          });
-        }}
+        onChange={(e) => handleSearchChange(e.target.value)}
         className="h-11 w-full rounded-lg border border-black/20 px-4 text-base dark:border-white/20 dark:bg-transparent"
       />
 

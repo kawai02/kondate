@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { addDays, format } from "date-fns";
 import { generateShoppingListAction } from "@/lib/shopping-actions";
 
@@ -17,18 +16,18 @@ export function GenerateForm() {
   const [end, setEnd] = useState(format(addDays(new Date(today()), 6), "yyyy-MM-dd"));
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-  const router = useRouter();
 
   function handleGenerate() {
     setError(null);
     startTransition(async () => {
+      // generateShoppingListAction側のrevalidatePathで最新のRSCペイロードが返るため、
+      // router.refresh()は呼ばない（呼ぶとページ全体の再クエリが二重に走る）。
       const result = await generateShoppingListAction(start, end);
       if (!result.ok) {
         setError(result.message);
         return;
       }
       setOpen(false);
-      router.refresh();
     });
   }
 

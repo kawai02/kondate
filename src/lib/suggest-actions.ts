@@ -3,9 +3,9 @@
 import { addDays, format, parseISO } from "date-fns";
 import { revalidatePath } from "next/cache";
 import { requireSession } from "@/lib/require-session";
-import { listRecipes } from "@/lib/recipes";
+import { listRecipeSummaries } from "@/lib/recipes";
 import { getCookingStatsMap } from "@/lib/cooking-logs";
-import { addMenuEntry } from "@/lib/menu";
+import { addMenuEntries } from "@/lib/menu";
 import { suggestWeeklyMenu, GeminiExtractionError } from "@/lib/gemini";
 import type { WeeklyMenuCandidate, WeeklyMenuDay } from "@/lib/gemini";
 
@@ -29,12 +29,14 @@ export async function suggestWeeklyMenuAction(
 ): Promise<ActionResult<SuggestedDay[]>> {
   await requireSession();
 
-  const recipes = await listRecipes();
+  const [recipes, statsMap] = await Promise.all([
+    listRecipeSummaries(),
+    getCookingStatsMap(),
+  ]);
   if (recipes.length === 0) {
     return { ok: false, message: "レシピが登録されていない" };
   }
 
-  const statsMap = await getCookingStatsMap();
   const candidates: WeeklyMenuCandidate[] = recipes.map((r) => ({
     title: r.title,
     tags: r.tags,
@@ -91,8 +93,8 @@ export async function confirmSuggestionAction(
   entries: { date: string; recipe_id: string }[]
 ): Promise<void> {
   await requireSession();
-  for (const entry of entries) {
-    await addMenuEntry({ date: entry.date, recipe_id: entry.recipe_id, servings: null });
-  }
+  await addMenuEntries(
+    entries.map((entry) => ({ date: entry.date, recipe_id: entry.recipe_id, servings: null }))
+  );
   revalidatePath("/");
 }

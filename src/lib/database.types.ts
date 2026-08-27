@@ -195,8 +195,30 @@ export type Database = {
         ];
       };
     };
-    Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Views: {
+      recipe_cooking_stats: {
+        Row: {
+          recipe_id: string;
+          count: number;
+          last_cooked_on: string | null;
+        };
+        Relationships: [];
+      };
+    };
+    Functions: {
+      list_recipe_tags: {
+        Args: Record<string, never>;
+        Returns: string[];
+      };
+      swap_menu_entry_position: {
+        Args: { p_date: string; p_id: string; p_direction: string };
+        Returns: undefined;
+      };
+      move_menu_entry_to_date: {
+        Args: { p_id: string; p_new_date: string };
+        Returns: undefined;
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

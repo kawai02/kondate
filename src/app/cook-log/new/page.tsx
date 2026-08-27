@@ -10,10 +10,8 @@ export default async function NewCookLogPage(props: PageProps<"/cook-log/new">) 
   const menuEntryId =
     typeof searchParams.menu_entry_id === "string" ? searchParams.menu_entry_id : null;
 
-  const recipe = await getRecipe(recipeId);
+  const [recipe, authors] = await Promise.all([getRecipe(recipeId), listAuthors()]);
   if (!recipe) notFound();
-
-  const authors = await listAuthors();
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-6">

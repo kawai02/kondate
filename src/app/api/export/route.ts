@@ -24,12 +24,30 @@ export async function GET() {
   const supabase = getSupabase();
   const data: Record<string, unknown> = {};
 
-  for (const table of TABLES) {
-    const { data: rows, error } = await supabase.from(table).select("*");
-    if (error) {
-      return Response.json({ error: `${table}の取得に失敗した` }, { status: 500 });
+  // 6テーブルの全件ダンプを並列化する（従来はテーブルごとに逐次await）。
+  const results = await Promise.all(
+    TABLES.map(async (table) => {
+      const rows: unknown[] = [];
+      // PostgRESTのデフォルト行数上限に引っかからないようページングする。
+      const pageSize = 1000;
+      for (let offset = 0; ; offset += pageSize) {
+        const { data: page, error } = await supabase
+          .from(table)
+          .select("*")
+          .range(offset, offset + pageSize - 1);
+        if (error) return { table, error };
+        rows.push(...(page ?? []));
+        if (!page || page.length < pageSize) break;
+      }
+      return { table, rows };
+    })
+  );
+
+  for (const result of results) {
+    if ("error" in result && result.error) {
+      return Response.json({ error: `${result.table}の取得に失敗した` }, { status: 500 });
     }
-    data[table] = rows;
+    data[result.table] = "rows" in result ? result.rows : [];
   }
 
   const filename = `kondate-export-${format(new Date(), "yyyy-MM-dd")}.json`;

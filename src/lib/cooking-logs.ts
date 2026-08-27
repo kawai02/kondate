@@ -44,41 +44,35 @@ export async function listAuthors(): Promise<string[]> {
 
 export type CookingStats = { count: number; lastCookedOn: string | null };
 
-// 仕様書4.4・4.12「調理回数」「最終調理日」。
+// 仕様書4.4・4.12「調理回数」「最終調理日」。recipe_cooking_stats(DB側の集計ビュー)を使う。
 export async function getCookingStats(recipeId: string): Promise<CookingStats> {
   const supabase = getSupabase();
-  const { data, error, count } = await supabase
-    .from("cooking_logs")
-    .select("cooked_on", { count: "exact" })
+  const { data, error } = await supabase
+    .from("recipe_cooking_stats")
+    .select("count, last_cooked_on")
     .eq("recipe_id", recipeId)
-    .order("cooked_on", { ascending: false })
-    .limit(1);
+    .maybeSingle();
   if (error) throw error;
 
   return {
-    count: count ?? 0,
-    lastCookedOn: data?.[0]?.cooked_on ?? null,
+    count: data?.count ?? 0,
+    lastCookedOn: data?.last_cooked_on ?? null,
   };
 }
 
 // レシピ一覧の「しばらく作っていない順」並び替えとカード表示用。
-// 一覧で1件ずつgetCookingStatsを呼ぶとN+1になるため、全件取得してJS側で集計する。
+// recipe_cooking_stats(DB側でGROUP BY済みのビュー)から取得するので、
+// cooking_logs全件をアプリ側に転送する必要がない。
 export async function getCookingStatsMap(): Promise<Map<string, CookingStats>> {
   const supabase = getSupabase();
   const { data, error } = await supabase
-    .from("cooking_logs")
-    .select("recipe_id, cooked_on")
-    .order("cooked_on", { ascending: false });
+    .from("recipe_cooking_stats")
+    .select("recipe_id, count, last_cooked_on");
   if (error) throw error;
 
   const map = new Map<string, CookingStats>();
   for (const row of data ?? []) {
-    const existing = map.get(row.recipe_id);
-    if (existing) {
-      existing.count += 1;
-    } else {
-      map.set(row.recipe_id, { count: 1, lastCookedOn: row.cooked_on });
-    }
+    map.set(row.recipe_id, { count: row.count, lastCookedOn: row.last_cooked_on });
   }
   return map;
 }

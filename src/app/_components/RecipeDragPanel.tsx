@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 type PickerRecipe = { id: string; title: string; tags: string[] };
 
@@ -11,13 +11,20 @@ export function RecipeDragPanel({ recipes }: { recipes: PickerRecipe[] }) {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   // 登録済みレシピが実際に使っているタグだけを候補にする（空振りする選択肢を出さない）。
-  const tagOptions = Array.from(new Set(recipes.flatMap((r) => r.tags))).sort();
+  const tagOptions = useMemo(
+    () => Array.from(new Set(recipes.flatMap((r) => r.tags))).sort(),
+    [recipes]
+  );
 
   // タグはAND条件で絞り込む（レシピ一覧・レシピ選択モーダルと同じ挙動に揃える）。
-  const filtered = recipes.filter(
-    (r) =>
-      r.title.toLowerCase().includes(q.toLowerCase()) &&
-      selectedTags.every((t) => r.tags.includes(t))
+  const filtered = useMemo(
+    () =>
+      recipes.filter(
+        (r) =>
+          r.title.toLowerCase().includes(q.toLowerCase()) &&
+          selectedTags.every((t) => r.tags.includes(t))
+      ),
+    [recipes, q, selectedTags]
   );
 
   function toggleTag(tag: string) {

@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useOptimistic, useState, useTransition } from "react";
 import {
   toggleShoppingItemAction,
   addManualItemAction,
@@ -37,14 +36,21 @@ export function ShoppingItemsView({ list }: { list: ShoppingListWithItems }) {
   const [showPantry, setShowPantry] = useState(false);
   const [copied, setCopied] = useState(false);
   const [, startTransition] = useTransition();
-  const router = useRouter();
 
-  const visibleItems = showPantry ? list.items : list.items.filter((i) => !i.is_pantry);
+  // チェック操作はサーバー往復を待たずに即座に反映する
+  // （従来はrevalidatePath+router.refresh()の2回のページ再生成が終わるまで見た目が変わらなかった）。
+  const [optimisticItems, applyOptimisticToggle] = useOptimistic(
+    list.items,
+    (state: ShoppingItem[], action: { id: string; checked: boolean }) =>
+      state.map((item) => (item.id === action.id ? { ...item, checked: action.checked } : item))
+  );
+
+  const visibleItems = showPantry ? optimisticItems : optimisticItems.filter((i) => !i.is_pantry);
 
   function handleToggle(id: string, checked: boolean) {
     startTransition(async () => {
+      applyOptimisticToggle({ id, checked });
       await toggleShoppingItemAction(id, checked);
-      router.refresh();
     });
   }
 

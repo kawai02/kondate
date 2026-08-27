@@ -1,15 +1,12 @@
 import Link from "next/link";
 import { addDays, eachDayOfInterval, endOfMonth, endOfWeek, format, parseISO, startOfMonth, startOfWeek } from "date-fns";
 import { listMenuEntries } from "@/lib/menu";
-import { listRecipes } from "@/lib/recipes";
-import { addMenuEntryForDateAction } from "@/lib/menu-actions";
-import { MenuEntryCard } from "@/app/_components/MenuEntryCard";
-import { RecipePickerSheet } from "@/app/_components/RecipePickerSheet";
+import { listRecipeSummaries } from "@/lib/recipes";
+import { DayMenuList } from "@/app/_components/DayMenuList";
 import { MonthGrid } from "@/app/_components/MonthGrid";
 import { RecipeDragPanel } from "@/app/_components/RecipeDragPanel";
 
 const RANGE_DAYS = 14;
-const WEEKDAY_LABELS = ["日", "月", "火", "水", "木", "金", "土"];
 
 function todayISO(): string {
   const d = new Date();
@@ -48,9 +45,6 @@ export default async function CalendarPage(props: PageProps<"/">) {
   const searchParams = await props.searchParams;
   const view = searchParams.view === "month" ? "month" : "list";
 
-  const recipes = await listRecipes();
-  const pickerRecipes = recipes.map((r) => ({ id: r.id, title: r.title, tags: r.tags }));
-
   const headerNav = (
     <div className="mb-4 flex items-center justify-between">
       <h1 className="text-xl font-semibold">献立</h1>
@@ -71,7 +65,11 @@ export default async function CalendarPage(props: PageProps<"/">) {
     const gridStart = startOfWeek(startOfMonth(monthDate));
     const gridEnd = endOfWeek(endOfMonth(monthDate));
 
-    const entries = await listMenuEntries(format(gridStart, "yyyy-MM-dd"), format(gridEnd, "yyyy-MM-dd"));
+    const [entries, recipes] = await Promise.all([
+      listMenuEntries(format(gridStart, "yyyy-MM-dd"), format(gridEnd, "yyyy-MM-dd")),
+      listRecipeSummaries(),
+    ]);
+    const pickerRecipes = recipes.map((r) => ({ id: r.id, title: r.title, tags: r.tags }));
 
     return (
       <main className="mx-auto max-w-5xl px-4 py-6">
@@ -93,17 +91,21 @@ export default async function CalendarPage(props: PageProps<"/">) {
   const endDate = addDays(startDate, RANGE_DAYS - 1);
   const end = format(endDate, "yyyy-MM-dd");
 
-  const entries = await listMenuEntries(start, end);
+  const [entries, recipes] = await Promise.all([
+    listMenuEntries(start, end),
+    listRecipeSummaries(),
+  ]);
+  const pickerRecipes = recipes.map((r) => ({ id: r.id, title: r.title, tags: r.tags }));
 
   const days = eachDayOfInterval({ start: startDate, end: endDate }).map((d) =>
     format(d, "yyyy-MM-dd")
   );
 
-  const entriesByDate = new Map<string, typeof entries>();
+  const entriesByDate: Record<string, typeof entries> = {};
   for (const entry of entries) {
-    const list = entriesByDate.get(entry.date) ?? [];
+    const list = entriesByDate[entry.date] ?? [];
     list.push(entry);
-    entriesByDate.set(entry.date, list);
+    entriesByDate[entry.date] = list;
   }
 
   const today = todayISO();
@@ -127,44 +129,12 @@ export default async function CalendarPage(props: PageProps<"/">) {
         </Link>
       </div>
 
-      <div className="space-y-4">
-        {days.map((date) => {
-          const dayEntries = entriesByDate.get(date) ?? [];
-          const d = parseISO(date);
-          const isToday = date === today;
-          return (
-            <section
-              key={date}
-              className={`rounded-2xl border p-3 ${
-                isToday
-                  ? "border-black bg-black/[0.03] dark:border-white dark:bg-white/[0.05]"
-                  : "border-black/10 dark:border-white/10"
-              }`}
-            >
-              <h2 className="mb-2 text-sm font-medium">
-                {format(d, "M月d日")}（{WEEKDAY_LABELS[d.getDay()]}）
-                {isToday && <span className="ml-2 text-xs text-black/50 dark:text-white/50">今日</span>}
-              </h2>
-              <div className="space-y-2">
-                {dayEntries.map((entry, i) => (
-                  <MenuEntryCard
-                    key={entry.id}
-                    entry={entry}
-                    isFirst={i === 0}
-                    isLast={i === dayEntries.length - 1}
-                  />
-                ))}
-              </div>
-              <div className="mt-2">
-                <RecipePickerSheet
-                  recipes={pickerRecipes}
-                  onPick={addMenuEntryForDateAction.bind(null, date)}
-                />
-              </div>
-            </section>
-          );
-        })}
-      </div>
+      <DayMenuList
+        days={days}
+        entriesByDate={entriesByDate}
+        pickerRecipes={pickerRecipes}
+        today={today}
+      />
     </main>
   );
 }

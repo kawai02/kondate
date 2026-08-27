@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { listRecipes } from "@/lib/recipes";
+import { listRecipeSummaries, listAllTags } from "@/lib/recipes";
 import { getCookingStatsMap } from "@/lib/cooking-logs";
 import { RecipeFilters } from "@/app/recipes/_components/RecipeFilters";
 import type { RecipeSort } from "@/lib/types";
@@ -24,12 +24,8 @@ export default async function RecipesPage(props: PageProps<"/recipes">) {
   const sort = parseSort(searchParams.sort);
   const planned = searchParams.planned === "1";
 
-  const [allRecipes, statsMap] = await Promise.all([
-    listRecipes({ tags, q, sort }),
-    getCookingStatsMap(),
-  ]);
-  const recipes = planned ? allRecipes.filter((r) => r.is_planned) : allRecipes;
-  const existingTags = Array.from(new Set(allRecipes.flatMap((r) => r.tags)));
+  const [statsMap, existingTags] = await Promise.all([getCookingStatsMap(), listAllTags()]);
+  const recipes = await listRecipeSummaries({ tags, q, sort, planned, statsMap });
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-6">

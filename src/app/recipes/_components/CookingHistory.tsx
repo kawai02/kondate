@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getCookingStats, listCookingLogs } from "@/lib/cooking-logs";
+import { listCookingLogs } from "@/lib/cooking-logs";
 
 function formatDate(iso: string): string {
   const [, m, d] = iso.split("-");
@@ -7,10 +7,10 @@ function formatDate(iso: string): string {
 }
 
 export async function CookingHistory({ recipeId }: { recipeId: string }) {
-  const [stats, logs] = await Promise.all([
-    getCookingStats(recipeId),
-    listCookingLogs(recipeId),
-  ]);
+  // logsはcooked_on降順なので、件数と最終調理日はここから導出できる
+  // （従来はgetCookingStatsで別途1往復していた）。
+  const logs = await listCookingLogs(recipeId);
+  const stats = { count: logs.length, lastCookedOn: logs[0]?.cooked_on ?? null };
 
   return (
     <section className="mt-8">

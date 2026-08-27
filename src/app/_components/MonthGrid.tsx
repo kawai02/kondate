@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useMemo, useOptimistic, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import {
   addMonths,
@@ -40,10 +39,18 @@ export function MonthGrid({
   entries: MenuEntryWithRecipe[];
   pickerRecipes: PickerRecipe[];
 }) {
-  const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [dragOverDate, setDragOverDate] = useState<string | null>(null);
   const dragDepth = useRef<Map<string, number>>(new Map());
+  const [, startTransition] = useTransition();
+
+  // 既存エントリの日付移動は、サーバー往復を待たずに先に見た目を動かす
+  // （revalidatePathの反映を待つと1〜数百msタイルが動かず引っかかって見える）。
+  const [optimisticEntries, applyOptimisticMove] = useOptimistic(
+    entries,
+    (state: MenuEntryWithRecipe[], action: { id: string; newDate: string }) =>
+      state.map((e) => (e.id === action.id ? { ...e, date: action.newDate } : e))
+  );
 
   const monthDate = parseISO(`${month}-01`);
   const gridStart = startOfWeek(startOfMonth(monthDate));
@@ -54,13 +61,13 @@ export function MonthGrid({
 
   const entriesByDate = useMemo(() => {
     const map = new Map<string, MenuEntryWithRecipe[]>();
-    for (const entry of entries) {
+    for (const entry of optimisticEntries) {
       const list = map.get(entry.date) ?? [];
       list.push(entry);
       map.set(entry.date, list);
     }
     return map;
-  }, [entries]);
+  }, [optimisticEntries]);
 
   const today = todayISO();
   const prevMonth = format(subMonths(monthDate, 1), "yyyy-MM");
@@ -93,9 +100,14 @@ export function MonthGrid({
     const id = parts.slice(2).join(":");
 
     if (kind === "recipe") {
-      addMenuEntryForDateAction(date, id).then(() => router.refresh());
+      // revalidatePath側で既に最新のRSCペイロードが返るため、router.refresh()は呼ばない
+      // （呼ぶとページ全体の再レンダリング・再クエリが二重に走ってしまう）。
+      addMenuEntryForDateAction(date, id);
     } else if (kind === "entry") {
-      moveMenuEntryToDateAction(id, date).then(() => router.refresh());
+      startTransition(() => {
+        applyOptimisticMove({ id, newDate: date });
+      });
+      moveMenuEntryToDateAction(id, date);
     }
   }
 

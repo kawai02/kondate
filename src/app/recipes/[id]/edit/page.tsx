@@ -2,14 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RecipeForm } from "@/app/recipes/_components/RecipeForm";
 import { updateRecipeAction } from "@/lib/recipe-actions";
-import { getRecipe, listRecipes } from "@/lib/recipes";
+import { getRecipe, listAllTags } from "@/lib/recipes";
 
 export default async function EditRecipePage(props: PageProps<"/recipes/[id]/edit">) {
   const { id } = await props.params;
-  const [recipe, recipes] = await Promise.all([getRecipe(id), listRecipes()]);
+  const [recipe, existingTags] = await Promise.all([getRecipe(id), listAllTags()]);
   if (!recipe) notFound();
-
-  const existingTags = Array.from(new Set(recipes.flatMap((r) => r.tags)));
   const action = updateRecipeAction.bind(null, id);
 
   return (
