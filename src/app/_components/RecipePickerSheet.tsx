@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import styles from "@/app/_components/kondate-theme.module.css";
 
 export type PickerRecipe = {
   id: string;
@@ -54,11 +55,15 @@ export function RecipePickerDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-20 flex items-end bg-black/40 sm:items-center sm:justify-center">
-      <div className="max-h-[80vh] w-full overflow-y-auto rounded-t-2xl bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-2xl dark:bg-neutral-900">
+    <div className={`${styles.root} ${styles.dialogOverlay}`}>
+      <div className={`${styles.card} ${styles.dialogPanel} max-h-[80vh] w-full overflow-y-auto p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]`}>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-base font-semibold">レシピを選択</h2>
-          <button type="button" onClick={onClose} className="text-black/50 dark:text-white/50">
+          <h2 className={`${styles.heading} text-base text-[var(--outline)]`}>🐾 レシピを選択</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className={`${styles.chunky} ${styles.cCream} px-3 py-1 text-xs`}
+          >
             閉じる
           </button>
         </div>
@@ -67,7 +72,7 @@ export function RecipePickerDialog({
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="レシピ名で検索"
-          className="mb-3 h-11 w-full rounded-lg border border-black/20 px-3 text-base dark:border-white/20 dark:bg-transparent"
+          className={`${styles.searchInput} mb-3 h-11 w-full px-3 text-base`}
         />
 
         {tagOptions.length > 0 && (
@@ -77,11 +82,7 @@ export function RecipePickerDialog({
                 key={tag}
                 type="button"
                 onClick={() => toggleTag(tag)}
-                className={`h-8 rounded-full border px-3 text-xs ${
-                  selectedTags.includes(tag)
-                    ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                    : "border-black/20 dark:border-white/20"
-                }`}
+                className={`${styles.tagChip} ${selectedTags.includes(tag) ? styles.tagChipActive : ""} h-8 px-3 text-xs`}
               >
                 {tag}
               </button>
@@ -90,7 +91,7 @@ export function RecipePickerDialog({
               <button
                 type="button"
                 onClick={() => setSelectedTags([])}
-                className="h-8 px-2 text-xs text-black/50 underline dark:text-white/50"
+                className="h-8 px-2 text-xs font-bold text-[var(--ink-soft)] underline"
               >
                 クリア
               </button>
@@ -105,11 +106,11 @@ export function RecipePickerDialog({
                 type="button"
                 disabled={pending}
                 onClick={() => pick(r.id)}
-                className="w-full rounded-lg px-3 py-3 text-left text-sm hover:bg-black/5 disabled:opacity-50 dark:hover:bg-white/10"
+                className="w-full rounded-xl px-3 py-3 text-left text-sm font-bold hover:bg-[var(--card-2)] disabled:opacity-50"
               >
                 {r.title}
                 {r.tags.length > 0 && (
-                  <span className="ml-2 text-xs text-black/40 dark:text-white/40">
+                  <span className="ml-2 text-xs font-normal text-[var(--ink-soft)]">
                     {r.tags.slice(0, 2).map((t) => `#${t}`).join(" ")}
                   </span>
                 )}
@@ -117,9 +118,7 @@ export function RecipePickerDialog({
             </li>
           ))}
           {filtered.length === 0 && (
-            <p className="px-3 py-6 text-center text-sm text-black/50 dark:text-white/50">
-              該当レシピなし
-            </p>
+            <p className="px-3 py-6 text-center text-sm text-[var(--ink-soft)]">該当レシピなし</p>
           )}
         </ul>
       </div>
@@ -140,11 +139,7 @@ export function RecipePickerSheet({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="h-10 w-full rounded-lg border border-dashed border-black/30 text-sm text-black/60 dark:border-white/30 dark:text-white/60"
-      >
+      <button type="button" onClick={() => setOpen(true)} className={`${styles.addEntry} h-10 w-full`}>
         {triggerLabel}
       </button>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import styles from "@/app/_components/kondate-theme.module.css";
 
 type PickerRecipe = { id: string; title: string; tags: string[] };
 
@@ -34,12 +35,12 @@ export function RecipeDragPanel({ recipes }: { recipes: PickerRecipe[] }) {
   }
 
   return (
-    <div className="hidden w-64 shrink-0 lg:block">
+    <div className={`${styles.card} hidden w-64 shrink-0 p-3 lg:block`}>
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="レシピ名で検索"
-        className="mb-2 h-10 w-full rounded-lg border border-black/20 px-3 text-sm dark:border-white/20 dark:bg-transparent"
+        className={`${styles.searchInput} mb-2 h-10 w-full px-3 text-sm`}
       />
 
       {tagOptions.length > 0 && (
@@ -49,11 +50,7 @@ export function RecipeDragPanel({ recipes }: { recipes: PickerRecipe[] }) {
               key={tag}
               type="button"
               onClick={() => toggleTag(tag)}
-              className={`h-7 rounded-full border px-2 text-xs ${
-                selectedTags.includes(tag)
-                  ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                  : "border-black/20 dark:border-white/20"
-              }`}
+              className={`${styles.tagChip} ${selectedTags.includes(tag) ? styles.tagChipActive : ""} h-7 px-2 text-xs`}
             >
               {tag}
             </button>
@@ -62,7 +59,7 @@ export function RecipeDragPanel({ recipes }: { recipes: PickerRecipe[] }) {
             <button
               type="button"
               onClick={() => setSelectedTags([])}
-              className="h-7 px-1 text-xs text-black/50 underline dark:text-white/50"
+              className="h-7 px-1 text-xs font-bold text-[var(--ink-soft)] underline"
             >
               クリア
             </button>
@@ -70,9 +67,7 @@ export function RecipeDragPanel({ recipes }: { recipes: PickerRecipe[] }) {
         </div>
       )}
 
-      <p className="mb-2 text-xs text-black/40 dark:text-white/40">
-        日付セルへドラッグして配置できる
-      </p>
+      <p className="mb-2 text-xs font-bold text-[var(--ink-soft)]">日付セルへドラッグして配置できる</p>
 
       <ul className="max-h-[70vh] space-y-1 overflow-y-auto">
         {filtered.map((r) => (
@@ -82,15 +77,13 @@ export function RecipeDragPanel({ recipes }: { recipes: PickerRecipe[] }) {
             onDragStart={(e) => {
               e.dataTransfer.setData("text/plain", `kondate:recipe:${r.id}`);
             }}
-            className="cursor-grab rounded-lg border border-black/10 px-3 py-2 text-sm dark:border-white/10"
+            className="cursor-grab rounded-xl border-2 border-[var(--card-2)] bg-[var(--paper)] px-3 py-2 text-sm font-bold hover:border-[var(--outline)]"
           >
             {r.title}
           </li>
         ))}
         {filtered.length === 0 && (
-          <p className="py-4 text-center text-xs text-black/50 dark:text-white/50">
-            該当レシピなし
-          </p>
+          <p className="py-4 text-center text-xs text-[var(--ink-soft)]">該当レシピなし</p>
         )}
       </ul>
     </div>

@@ -5,6 +5,7 @@ import { listRecipeSummaries } from "@/lib/recipes";
 import { DayMenuList } from "@/app/_components/DayMenuList";
 import { MonthGrid } from "@/app/_components/MonthGrid";
 import { RecipeDragPanel } from "@/app/_components/RecipeDragPanel";
+import styles from "@/app/_components/kondate-theme.module.css";
 
 const RANGE_DAYS = 14;
 
@@ -16,24 +17,16 @@ function todayISO(): string {
 
 function ViewToggle({ view }: { view: "list" | "month" }) {
   return (
-    <div className="mb-4 flex gap-2 text-sm">
+    <div className={`${styles.viewToggle} mb-4 text-sm`}>
       <Link
         href="/"
-        className={`rounded-lg px-3 py-1 ${
-          view === "list"
-            ? "bg-black text-white dark:bg-white dark:text-black"
-            : "border border-black/20 dark:border-white/20"
-        }`}
+        className={`${styles.chunky} ${view === "list" ? styles.cOrange : styles.cCream} flex-1 px-4 py-2`}
       >
         リスト
       </Link>
       <Link
         href={`/?view=month&month=${format(new Date(), "yyyy-MM")}`}
-        className={`rounded-lg px-3 py-1 ${
-          view === "month"
-            ? "bg-black text-white dark:bg-white dark:text-black"
-            : "border border-black/20 dark:border-white/20"
-        }`}
+        className={`${styles.chunky} ${view === "month" ? styles.cOrange : styles.cCream} flex-1 px-4 py-2`}
       >
         月
       </Link>
@@ -46,17 +39,24 @@ export default async function CalendarPage(props: PageProps<"/">) {
   const view = searchParams.view === "month" ? "month" : "list";
 
   const headerNav = (
-    <div className="mb-4 flex items-center justify-between">
-      <h1 className="text-xl font-semibold">献立</h1>
-      <div className="flex gap-3 text-sm">
-        <Link href="/menu/suggest" className="text-black/60 underline dark:text-white/60">
-          AIに提案してもらう
-        </Link>
-        <Link href="/menu/copy" className="text-black/60 underline dark:text-white/60">
-          献立をコピー
-        </Link>
+    <>
+      <div className={`${styles.appHeader} mb-3`}>
+        <h1 className={`${styles.chunky} ${styles.cCream} ${styles.appTitle}`}>献立</h1>
+        <div className={`${styles.headerLinks}`}>
+          <Link href="/menu/suggest" className={`${styles.chunky} ${styles.cGreen} px-3 py-1.5 text-xs`}>
+            AIに提案
+          </Link>
+          <Link href="/menu/copy" className={`${styles.chunky} ${styles.cOrange} px-3 py-1.5 text-xs`}>
+            コピー
+          </Link>
+        </div>
       </div>
-    </div>
+      <div className={`${styles.mascotRow} mb-4`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/cat-mascot.jpg" alt="" className={styles.mascotImg} />
+        <div className={styles.bubble}>今日はなに作るニャ？🐾</div>
+      </div>
+    </>
   );
 
   if (view === "month") {
@@ -117,14 +117,14 @@ export default async function CalendarPage(props: PageProps<"/">) {
       {headerNav}
       <ViewToggle view="list" />
 
-      <div className="mb-6 flex items-center justify-between text-sm">
-        <Link href={`/?start=${prevStart}`} className="text-black/60 dark:text-white/60">
+      <div className={`${styles.chunky} ${styles.cCream} ${styles.weekNav} mb-6`}>
+        <Link href={`/?start=${prevStart}`} className={styles.weekNavSide}>
           ← 前の2週間
         </Link>
-        <Link href="/" className="font-medium">
+        <Link href="/" className={`${styles.chunky} ${styles.cPink} px-3 py-1 text-xs`}>
           今日
         </Link>
-        <Link href={`/?start=${nextStart}`} className="text-black/60 dark:text-white/60">
+        <Link href={`/?start=${nextStart}`} className={styles.weekNavSide}>
           次の2週間 →
         </Link>
       </div>

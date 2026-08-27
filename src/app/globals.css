@@ -5,20 +5,53 @@
    常時ライト表示になる。既存コンポーネントのdark:クラスを1つずつ消さずに済む。 */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* アプリ全体の配色トークン（docs/design-mockup.html準拠、太い縁取り線・チャンキーな
+   ボタン・原色パレットの「元気でかわいい」デザイン）。src/app/_components/
+   kondate-theme.module.cssの各クラスがこれらのカスタムプロパティを参照する。
+   ダークモードは上記の仕組みで常時無効化されているため、配色は単一のライトテーマ
+   のみを固定で持つ（@media (prefers-color-scheme)等は使わない）。 */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #ffffff;
+  --paper-2: #eeebe2;
+  --ink: #4a2e2a;
+  --ink-soft: #8a6a56;
+  --outline: #5b2a2e;
+  --card: #ffffff;
+  --card-2: #ede6d4;
+
+  --green: #7cc24a;
+  --green-deep: #4d8f2c;
+  --green-soft: #e6f5d9;
+
+  --orange: #f2903d;
+  --orange-deep: #c96a22;
+  --orange-soft: #fde9d2;
+
+  --sky: #1f9dc4;
+  --sky-deep: #0f6780;
+  --sky-soft: #dff3f8;
+
+  --pink: #e8567b;
+  --pink-deep: #ab3653;
+  --pink-soft: #f8d0d9;
+
+  --font-heading: "Mochiy Pop One", "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+  --font-body: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+
+  --background: var(--paper);
+  --foreground: var(--ink);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-body);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
 }

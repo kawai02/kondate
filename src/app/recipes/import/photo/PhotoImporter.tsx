@@ -6,6 +6,7 @@ import { createRecipeAction } from "@/lib/recipe-actions";
 import { RecipeForm } from "@/app/recipes/_components/RecipeForm";
 import { resizeImage } from "@/lib/resize-image";
 import type { RecipeFormValues } from "@/lib/types";
+import styles from "@/app/_components/kondate-theme.module.css";
 
 export function PhotoImporter({ existingTags }: { existingTags: string[] }) {
   const [files, setFiles] = useState<File[]>([]);
@@ -71,7 +72,7 @@ export function PhotoImporter({ existingTags }: { existingTags: string[] }) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <label className="block text-sm font-medium" htmlFor="photos">
+        <label className="block text-sm font-bold" htmlFor="photos">
           写真（複数可、料理本の見開きなど）
         </label>
         <input
@@ -83,7 +84,7 @@ export function PhotoImporter({ existingTags }: { existingTags: string[] }) {
           onChange={(e) => handleSelect(e.target.files)}
           className="block w-full text-sm"
         />
-        <p className="text-xs text-black/50 dark:text-white/50">
+        <p className="text-xs text-[var(--ink-soft)]">
           保存されるのは1枚目のみ。解析には選んだ写真すべてを使う。
         </p>
       </div>
@@ -92,18 +93,23 @@ export function PhotoImporter({ existingTags }: { existingTags: string[] }) {
         <div className="flex flex-wrap gap-2">
           {previews.map((src, i) => (
             // eslint-disable-next-line @next/next/no-img-element
-            <img key={i} src={src} alt="" className="h-24 w-24 rounded-lg object-cover" />
+            <img
+              key={i}
+              src={src}
+              alt=""
+              className="h-24 w-24 rounded-xl border-2 border-[var(--outline)] object-cover"
+            />
           ))}
         </div>
       )}
 
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className={`${styles.dangerLink} text-sm`}>{error}</p>}
 
       <button
         type="button"
         onClick={handleExtract}
         disabled={pending || files.length === 0}
-        className="h-12 w-full rounded-lg bg-black text-base font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
+        className={`${styles.chunky} ${styles.cOrange} h-12 w-full text-base disabled:opacity-50`}
       >
         {pending ? "解析中…" : "AIで解析"}
       </button>

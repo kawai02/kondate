@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import { INITIAL_TAGS } from "@/lib/tags";
 import type { Ingredient, RecipeFormValues, SourceType, Step } from "@/lib/types";
+import styles from "@/app/_components/kondate-theme.module.css";
 
 type Props = {
   action: (formData: FormData) => void;
@@ -87,13 +88,13 @@ export function RecipeForm({ action, initial, existingTags, confidence }: Props)
       />
 
       {confidence === "low" && (
-        <div className="rounded-lg border border-amber-400/60 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-400/40 dark:bg-amber-950/40 dark:text-amber-200">
+        <div className={`${styles.noticeCard} px-4 py-3 text-sm`}>
           AIによる抽出の精度が低い可能性がある。材料・手順を確認・修正してから保存してほしい。
         </div>
       )}
 
       <section className="space-y-2">
-        <label className="block text-sm font-medium" htmlFor="title">
+        <label className="block text-sm font-bold" htmlFor="title">
           タイトル
         </label>
         <input
@@ -101,13 +102,13 @@ export function RecipeForm({ action, initial, existingTags, confidence }: Props)
           name="title"
           required
           defaultValue={initial?.title}
-          className="h-12 w-full rounded-lg border border-black/20 px-4 text-base dark:border-white/20 dark:bg-transparent"
+          className={`${styles.searchInput} h-12 w-full px-4 text-base`}
         />
       </section>
 
       <section className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label className="block text-sm font-medium" htmlFor="base_servings">
+          <label className="block text-sm font-bold" htmlFor="base_servings">
             人数（何人前）
           </label>
           <input
@@ -117,11 +118,11 @@ export function RecipeForm({ action, initial, existingTags, confidence }: Props)
             step="0.5"
             min="0"
             defaultValue={initial?.base_servings ?? undefined}
-            className="h-12 w-full rounded-lg border border-black/20 px-4 text-base dark:border-white/20 dark:bg-transparent"
+            className={`${styles.searchInput} h-12 w-full px-4 text-base`}
           />
         </div>
         <div className="space-y-2">
-          <label className="block text-sm font-medium" htmlFor="cook_time_min">
+          <label className="block text-sm font-bold" htmlFor="cook_time_min">
             調理時間（分）
           </label>
           <input
@@ -130,13 +131,13 @@ export function RecipeForm({ action, initial, existingTags, confidence }: Props)
             type="number"
             min="0"
             defaultValue={initial?.cook_time_min ?? undefined}
-            className="h-12 w-full rounded-lg border border-black/20 px-4 text-base dark:border-white/20 dark:bg-transparent"
+            className={`${styles.searchInput} h-12 w-full px-4 text-base`}
           />
         </div>
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-medium">材料</h2>
+        <h2 className="text-sm font-bold">材料</h2>
         <div className="space-y-2">
           {ingredients.map((ing, i) => (
             <div key={i} className="flex items-center gap-2">
@@ -144,7 +145,7 @@ export function RecipeForm({ action, initial, existingTags, confidence }: Props)
                 placeholder="材料名"
                 value={ing.name}
                 onChange={(e) => updateIngredient(i, { name: e.target.value })}
-                className="h-11 flex-1 min-w-0 rounded-lg border border-black/20 px-3 text-base dark:border-white/20 dark:bg-transparent"
+                className={`${styles.searchInput} h-11 min-w-0 flex-1 px-3 text-base`}
               />
               <input
                 placeholder="分量"
@@ -156,27 +157,27 @@ export function RecipeForm({ action, initial, existingTags, confidence }: Props)
                     amount: e.target.value === "" ? null : Number(e.target.value),
                   })
                 }
-                className="h-11 w-20 rounded-lg border border-black/20 px-2 text-base dark:border-white/20 dark:bg-transparent"
+                className={`${styles.searchInput} h-11 w-20 px-2 text-base`}
               />
               <input
                 placeholder="単位"
                 value={ing.unit ?? ""}
                 onChange={(e) => updateIngredient(i, { unit: e.target.value })}
-                className="h-11 w-16 rounded-lg border border-black/20 px-2 text-base dark:border-white/20 dark:bg-transparent"
+                className={`${styles.searchInput} h-11 w-16 px-2 text-base`}
               />
               <label className="flex items-center gap-1 text-xs whitespace-nowrap">
                 <input
                   type="checkbox"
                   checked={ing.is_pantry}
                   onChange={(e) => updateIngredient(i, { is_pantry: e.target.checked })}
-                  className="h-5 w-5"
+                  className="h-5 w-5 accent-[var(--orange)]"
                 />
                 常備品
               </label>
               <button
                 type="button"
                 onClick={() => setIngredients((prev) => prev.filter((_, idx) => idx !== i))}
-                className="h-11 w-11 shrink-0 rounded-lg border border-black/20 text-lg dark:border-white/20"
+                className={`${styles.chunky} ${styles.cPink} h-11 w-11 shrink-0 text-lg`}
                 aria-label="材料を削除"
               >
                 ×
@@ -187,31 +188,31 @@ export function RecipeForm({ action, initial, existingTags, confidence }: Props)
         <button
           type="button"
           onClick={() => setIngredients((prev) => [...prev, emptyIngredient()])}
-          className="h-11 w-full rounded-lg border border-dashed border-black/30 text-sm dark:border-white/30"
+          className={`${styles.addEntry} h-11 w-full`}
         >
           + 材料を追加
         </button>
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-medium">手順</h2>
+        <h2 className="text-sm font-bold">手順</h2>
         <div className="space-y-2">
           {steps.map((step, i) => (
             <div key={i} className="flex items-start gap-2">
-              <span className="mt-3 w-6 shrink-0 text-sm text-black/50 dark:text-white/50">
+              <span className="mt-3 w-6 shrink-0 text-sm font-bold text-[var(--ink-soft)]">
                 {i + 1}
               </span>
               <textarea
                 value={step.text}
                 onChange={(e) => updateStep(i, e.target.value)}
                 rows={2}
-                className="min-h-11 flex-1 min-w-0 rounded-lg border border-black/20 px-3 py-2 text-base dark:border-white/20 dark:bg-transparent"
+                className={`${styles.searchInput} min-h-11 min-w-0 flex-1 px-3 py-2 text-base`}
               />
               <div className="flex shrink-0 flex-col gap-1">
                 <button
                   type="button"
                   onClick={() => moveStep(i, "up")}
-                  className="h-8 w-8 rounded-lg border border-black/20 text-sm dark:border-white/20"
+                  className={`${styles.chunky} ${styles.cCream} h-8 w-8 text-sm`}
                   aria-label="上へ"
                 >
                   ↑
@@ -219,7 +220,7 @@ export function RecipeForm({ action, initial, existingTags, confidence }: Props)
                 <button
                   type="button"
                   onClick={() => moveStep(i, "down")}
-                  className="h-8 w-8 rounded-lg border border-black/20 text-sm dark:border-white/20"
+                  className={`${styles.chunky} ${styles.cCream} h-8 w-8 text-sm`}
                   aria-label="下へ"
                 >
                   ↓
@@ -228,7 +229,7 @@ export function RecipeForm({ action, initial, existingTags, confidence }: Props)
               <button
                 type="button"
                 onClick={() => setSteps((prev) => prev.filter((_, idx) => idx !== i))}
-                className="h-11 w-11 shrink-0 rounded-lg border border-black/20 text-lg dark:border-white/20"
+                className={`${styles.chunky} ${styles.cPink} h-11 w-11 shrink-0 text-lg`}
                 aria-label="手順を削除"
               >
                 ×
@@ -239,25 +240,21 @@ export function RecipeForm({ action, initial, existingTags, confidence }: Props)
         <button
           type="button"
           onClick={() => setSteps((prev) => [...prev, emptyStep(prev.length)])}
-          className="h-11 w-full rounded-lg border border-dashed border-black/30 text-sm dark:border-white/30"
+          className={`${styles.addEntry} h-11 w-full`}
         >
           + 手順を追加
         </button>
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-medium">タグ</h2>
+        <h2 className="text-sm font-bold">タグ</h2>
         <div className="flex flex-wrap gap-2">
           {tagOptions.map((tag) => (
             <button
               key={tag}
               type="button"
               onClick={() => toggleTag(tag)}
-              className={`h-9 rounded-full border px-3 text-sm ${
-                tags.includes(tag)
-                  ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                  : "border-black/20 dark:border-white/20"
-              }`}
+              className={`${styles.tagChip} ${tags.includes(tag) ? styles.tagChipActive : ""} h-9 px-3 text-sm`}
             >
               {tag}
             </button>
@@ -268,12 +265,12 @@ export function RecipeForm({ action, initial, existingTags, confidence }: Props)
             value={customTag}
             onChange={(e) => setCustomTag(e.target.value)}
             placeholder="自由入力タグ"
-            className="h-10 flex-1 rounded-lg border border-black/20 px-3 text-sm dark:border-white/20 dark:bg-transparent"
+            className={`${styles.searchInput} h-10 flex-1 px-3 text-sm`}
           />
           <button
             type="button"
             onClick={addCustomTag}
-            className="h-10 rounded-lg border border-black/20 px-3 text-sm dark:border-white/20"
+            className={`${styles.chunky} ${styles.cCream} h-10 px-3 text-sm`}
           >
             追加
           </button>
@@ -281,7 +278,7 @@ export function RecipeForm({ action, initial, existingTags, confidence }: Props)
       </section>
 
       <section className="space-y-2">
-        <label className="block text-sm font-medium" htmlFor="memo">
+        <label className="block text-sm font-bold" htmlFor="memo">
           メモ
         </label>
         <textarea
@@ -289,24 +286,21 @@ export function RecipeForm({ action, initial, existingTags, confidence }: Props)
           name="memo"
           rows={3}
           defaultValue={initial?.memo ?? undefined}
-          className="w-full rounded-lg border border-black/20 px-4 py-2 text-base dark:border-white/20 dark:bg-transparent"
+          className={`${styles.searchInput} w-full px-4 py-2 text-base`}
         />
       </section>
 
-      <label className="flex items-center gap-2 text-sm">
+      <label className="flex items-center gap-2 text-sm font-bold">
         <input
           type="checkbox"
           name="is_planned"
           defaultChecked={initial?.is_planned ?? true}
-          className="h-5 w-5"
+          className="h-5 w-5 accent-[var(--orange)]"
         />
         作りたいリストに入れる
       </label>
 
-      <button
-        type="submit"
-        className="h-12 w-full rounded-lg bg-black text-base font-medium text-white dark:bg-white dark:text-black"
-      >
+      <button type="submit" className={`${styles.chunky} ${styles.cOrange} h-12 w-full text-base`}>
         保存
       </button>
     </form>

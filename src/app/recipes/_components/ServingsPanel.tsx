@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { rewriteStepsAction } from "@/lib/scaling-actions";
 import { scaleIngredients } from "@/lib/scaling";
 import type { Recipe, Step } from "@/lib/types";
+import styles from "@/app/_components/kondate-theme.module.css";
 
 export function ServingsPanel({ recipe }: { recipe: Recipe }) {
   const baseServings = recipe.base_servings;
@@ -41,8 +42,8 @@ export function ServingsPanel({ recipe }: { recipe: Recipe }) {
   return (
     <>
       {baseServings != null && (
-        <section className="mt-6 rounded-xl border border-black/10 p-4 dark:border-white/10">
-          <label className="block text-sm font-medium" htmlFor="servings">
+        <section className={`${styles.card} mt-6 p-4`}>
+          <label className="block text-sm font-bold" htmlFor="servings">
             人数を変更する
           </label>
           <div className="mt-2 flex items-center gap-2">
@@ -53,36 +54,36 @@ export function ServingsPanel({ recipe }: { recipe: Recipe }) {
               min="0.5"
               value={servings}
               onChange={(e) => handleServingsChange(Number(e.target.value))}
-              className="h-11 w-24 rounded-lg border border-black/20 px-3 text-base dark:border-white/20 dark:bg-transparent"
+              className={`${styles.searchInput} h-11 w-24 px-3 text-base`}
             />
-            <span className="text-sm text-black/60 dark:text-white/60">人前</span>
+            <span className="text-sm font-bold text-[var(--ink-soft)]">人前</span>
           </div>
         </section>
       )}
 
       <section className="mt-8">
-        <h2 className="mb-3 text-lg font-semibold">材料</h2>
+        <h2 className={`${styles.heading} mb-3 text-lg text-[var(--outline)]`}>材料</h2>
         {recipe.ingredients.length === 0 ? (
-          <p className="text-sm text-black/50 dark:text-white/50">材料未登録</p>
+          <p className="text-sm text-[var(--ink-soft)]">材料未登録</p>
         ) : (
           <ul className="space-y-1">
             {(scaled ?? recipe.ingredients.map((i) => ({ ...i, originalAmount: null }))).map(
               (ing, i) => (
                 <li
                   key={i}
-                  className="flex justify-between border-b border-black/5 py-1.5 text-sm dark:border-white/10"
+                  className="flex justify-between border-b-2 border-[var(--card-2)] py-1.5 text-sm"
                 >
                   <span>
                     {ing.name}
                     {ing.is_pantry && (
-                      <span className="ml-2 text-xs text-black/40 dark:text-white/40">常備品</span>
+                      <span className="ml-2 text-xs font-bold text-[var(--ink-soft)]">常備品</span>
                     )}
                   </span>
-                  <span className="text-black/60 dark:text-white/60">
+                  <span className="text-[var(--ink-soft)]">
                     {ing.amount ?? ""}
                     {ing.unit ?? ""}
                     {isDifferentServings && ing.originalAmount != null && (
-                      <span className="ml-1 text-xs text-black/40 dark:text-white/40">
+                      <span className="ml-1 text-xs text-[var(--ink-soft)]">
                         （元: {baseServings}人前で{ing.originalAmount}
                         {ing.unit ?? ""}）
                       </span>
@@ -97,14 +98,14 @@ export function ServingsPanel({ recipe }: { recipe: Recipe }) {
 
       <section className="mt-8">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">手順</h2>
+          <h2 className={`${styles.heading} text-lg text-[var(--outline)]`}>手順</h2>
           {isDifferentServings && (
             <div className="flex items-center gap-3 text-sm">
               {rewrittenSteps && (
                 <button
                   type="button"
                   onClick={() => setShowOriginal((v) => !v)}
-                  className="text-black/60 underline dark:text-white/60"
+                  className="font-bold text-[var(--ink-soft)] underline"
                 >
                   {showOriginal
                     ? `${servings}人前の手順を表示`
@@ -116,7 +117,7 @@ export function ServingsPanel({ recipe }: { recipe: Recipe }) {
                   type="button"
                   onClick={handleRewrite}
                   disabled={pending}
-                  className="h-9 rounded-lg bg-black px-3 text-xs font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
+                  className={`${styles.chunky} ${styles.cOrange} h-9 px-3 text-xs disabled:opacity-50`}
                 >
                   {pending ? "書き換え中…" : "この人数に合わせて手順を書き換える"}
                 </button>
@@ -125,15 +126,15 @@ export function ServingsPanel({ recipe }: { recipe: Recipe }) {
           )}
         </div>
 
-        {error && <p className="mb-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
+        {error && <p className={`${styles.dangerLink} mb-3 text-sm`}>{error}</p>}
 
         {displayedSteps.length === 0 ? (
-          <p className="text-sm text-black/50 dark:text-white/50">手順未登録</p>
+          <p className="text-sm text-[var(--ink-soft)]">手順未登録</p>
         ) : (
           <ol className="space-y-3">
             {displayedSteps.map((step, i) => (
               <li key={i} className="flex gap-3 text-sm">
-                <span className="font-medium text-black/40 dark:text-white/40">{i + 1}</span>
+                <span className="font-bold text-[var(--ink-soft)]">{i + 1}</span>
                 <span>{step.text}</span>
               </li>
             ))}

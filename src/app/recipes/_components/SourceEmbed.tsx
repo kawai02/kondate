@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { Recipe } from "@/lib/types";
+import styles from "@/app/_components/kondate-theme.module.css";
 
 function youtubeEmbedUrl(sourceUrl: string): string | null {
   try {
@@ -28,7 +29,7 @@ export function SourceEmbed({ recipe }: { recipe: Recipe }) {
     const embed = youtubeEmbedUrl(recipe.source_url);
     if (embed) {
       return (
-        <div className="aspect-video overflow-hidden rounded-lg border border-black/10 dark:border-white/10">
+        <div className={`${styles.embedFrame} aspect-video`}>
           <iframe src={embed} className="h-full w-full" title="動画" allowFullScreen />
         </div>
       );
@@ -39,7 +40,7 @@ export function SourceEmbed({ recipe }: { recipe: Recipe }) {
     const embed = instagramEmbedUrl(recipe.source_url);
     if (embed) {
       return (
-        <div className="overflow-hidden rounded-lg border border-black/10 dark:border-white/10">
+        <div className={styles.embedFrame}>
           <iframe src={embed} className="h-[520px] w-full" title="Instagram投稿" />
         </div>
       );
@@ -48,7 +49,7 @@ export function SourceEmbed({ recipe }: { recipe: Recipe }) {
 
   if (recipe.thumbnail_url) {
     return (
-      <div className="overflow-hidden rounded-lg border border-black/10 dark:border-white/10">
+      <div className={styles.embedFrame}>
         <Image
           src={recipe.thumbnail_url}
           alt={recipe.title}

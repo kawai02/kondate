@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getRecipe } from "@/lib/recipes";
 import { listAuthors } from "@/lib/cooking-logs";
 import { CookLogForm } from "@/app/cook-log/new/CookLogForm";
+import styles from "@/app/_components/kondate-theme.module.css";
 
 export default async function NewCookLogPage(props: PageProps<"/cook-log/new">) {
   const searchParams = await props.searchParams;
@@ -16,11 +17,11 @@ export default async function NewCookLogPage(props: PageProps<"/cook-log/new">) 
   return (
     <main className="mx-auto max-w-2xl px-4 py-6">
       <div className="mb-4">
-        <Link href={`/recipes/${recipeId}`} className="text-sm text-black/60 dark:text-white/60">
+        <Link href={`/recipes/${recipeId}`} className={`${styles.backLink} text-sm`}>
           ← {recipe.title}
         </Link>
       </div>
-      <h1 className="mb-6 text-xl font-semibold">感想を記録</h1>
+      <h1 className={`${styles.heading} mb-6 text-xl text-[var(--outline)]`}>感想を記録</h1>
       <CookLogForm recipeId={recipeId} menuEntryId={menuEntryId} existingAuthors={authors} />
     </main>
   );

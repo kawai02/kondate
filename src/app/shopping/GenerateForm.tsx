@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { addDays, format } from "date-fns";
 import { generateShoppingListAction } from "@/lib/shopping-actions";
+import styles from "@/app/_components/kondate-theme.module.css";
 
 function today(): string {
   const d = new Date();
@@ -36,7 +37,7 @@ export function GenerateForm() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mb-6 h-11 w-full rounded-lg border border-dashed border-black/30 text-sm dark:border-white/30"
+        className={`${styles.addEntry} mb-6 h-11 w-full`}
       >
         + 新しいリストを作る
       </button>
@@ -44,36 +45,36 @@ export function GenerateForm() {
   }
 
   return (
-    <div className="mb-6 space-y-3 rounded-xl border border-black/10 p-4 dark:border-white/10">
+    <div className={`${styles.card} mb-6 space-y-3 p-4`}>
       <div className="flex items-center gap-2">
         <input
           type="date"
           value={start}
           onChange={(e) => setStart(e.target.value)}
-          className="h-11 rounded-lg border border-black/20 px-3 text-base dark:border-white/20 dark:bg-transparent"
+          className={`${styles.searchInput} h-11 px-3 text-base`}
         />
-        <span className="text-sm text-black/50 dark:text-white/50">〜</span>
+        <span className="text-sm text-[var(--ink-soft)]">〜</span>
         <input
           type="date"
           value={end}
           onChange={(e) => setEnd(e.target.value)}
-          className="h-11 rounded-lg border border-black/20 px-3 text-base dark:border-white/20 dark:bg-transparent"
+          className={`${styles.searchInput} h-11 px-3 text-base`}
         />
       </div>
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className={`${styles.dangerLink} text-sm`}>{error}</p>}
       <div className="flex gap-2">
         <button
           type="button"
           onClick={handleGenerate}
           disabled={pending}
-          className="h-11 flex-1 rounded-lg bg-black text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
+          className={`${styles.chunky} ${styles.cOrange} h-11 flex-1 text-sm disabled:opacity-50`}
         >
           {pending ? "生成中…" : "生成する"}
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="h-11 rounded-lg px-4 text-sm text-black/50 dark:text-white/50"
+          className="h-11 px-4 text-sm font-bold text-[var(--ink-soft)]"
         >
           キャンセル
         </button>

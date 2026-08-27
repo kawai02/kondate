@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { deleteMenuEntryAction, moveMenuEntryAction } from "@/lib/menu-actions";
 import type { MenuEntryWithRecipe } from "@/lib/types";
+import styles from "@/app/_components/kondate-theme.module.css";
 
 export function MenuEntryCard({
   entry,
@@ -15,7 +16,7 @@ export function MenuEntryCard({
   const servings = entry.servings ?? entry.recipe.base_servings;
 
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-black/10 p-3 dark:border-white/10">
+    <div className={`${styles.entry} flex items-center gap-2 border-b-2 border-[var(--card-2)] pb-3 last:border-b-0 last:pb-0`}>
       <Link href={`/recipes/${entry.recipe.id}`} className="flex min-w-0 flex-1 items-center gap-3">
         {entry.recipe.thumbnail_url ? (
           <Image
@@ -23,19 +24,21 @@ export function MenuEntryCard({
             alt=""
             width={112}
             height={64}
-            className="h-14 w-20 shrink-0 rounded-lg object-cover"
+            className="h-14 w-20 shrink-0 rounded-xl border-2 border-[var(--outline)] object-cover"
           />
         ) : (
-          <div className="flex h-14 w-20 shrink-0 items-center justify-center rounded-lg bg-black/5 text-xl dark:bg-white/10">
+          <div className="flex h-14 w-20 shrink-0 items-center justify-center rounded-xl border-2 border-[var(--outline)] bg-[var(--card-2)] text-xl">
             🍽
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <p className="truncate font-medium">{entry.recipe.title}</p>
-          <div className="mt-0.5 flex flex-wrap gap-2 text-xs text-black/50 dark:text-white/50">
-            {servings != null && <span>{servings}人前</span>}
+          <p className={`${styles.entryTitle} truncate`}>{entry.recipe.title}</p>
+          <div className="mt-1 flex flex-wrap gap-1.5">
+            {servings != null && <span className={styles.entryMetaTag}>{servings}人前</span>}
             {entry.recipe.tags.slice(0, 2).map((tag) => (
-              <span key={tag}>#{tag}</span>
+              <span key={tag} className={styles.entryMetaTag}>
+                #{tag}
+              </span>
             ))}
           </div>
         </div>
@@ -43,7 +46,7 @@ export function MenuEntryCard({
       <div className="flex shrink-0 items-center gap-1">
         <Link
           href={`/cook-log/new?recipe_id=${entry.recipe.id}&menu_entry_id=${entry.id}`}
-          className="flex h-9 items-center rounded-lg border border-black/20 px-2 text-xs dark:border-white/20"
+          className={`${styles.chunky} ${styles.cGreen} h-8 px-2.5 text-[11px]`}
         >
           作った
         </Link>
@@ -51,7 +54,7 @@ export function MenuEntryCard({
           <button
             type="submit"
             disabled={isFirst}
-            className="h-9 w-9 rounded-lg border border-black/20 text-sm disabled:opacity-30 dark:border-white/20"
+            className={`${styles.chunky} ${styles.cCream} h-8 w-8 text-sm`}
             aria-label="上へ"
           >
             ↑
@@ -61,7 +64,7 @@ export function MenuEntryCard({
           <button
             type="submit"
             disabled={isLast}
-            className="h-9 w-9 rounded-lg border border-black/20 text-sm disabled:opacity-30 dark:border-white/20"
+            className={`${styles.chunky} ${styles.cCream} h-8 w-8 text-sm`}
             aria-label="下へ"
           >
             ↓
@@ -70,7 +73,7 @@ export function MenuEntryCard({
         <form action={deleteMenuEntryAction.bind(null, entry.id)}>
           <button
             type="submit"
-            className="h-9 w-9 rounded-lg border border-black/20 text-sm text-red-600 dark:border-white/20 dark:text-red-400"
+            className={`${styles.chunky} ${styles.cPink} h-8 w-8 text-sm`}
             aria-label="削除"
           >
             ×

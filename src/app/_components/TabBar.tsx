@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
+import styles from "@/app/_components/kondate-theme.module.css";
 
 const TABS = [
   { href: "/", label: "献立" },
@@ -16,7 +17,7 @@ export function TabBar() {
   const planned = searchParams.get("planned") === "1";
 
   return (
-    <nav className="sticky bottom-0 z-10 flex border-t border-black/10 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur dark:border-white/10 dark:bg-black/95">
+    <nav className="sticky bottom-0 z-10 flex gap-1.5 border-t-[3px] border-[var(--outline)] bg-[var(--card)] px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
       {TABS.map((tab) => {
         const isPlannedTab = tab.href.includes("planned=1");
         const basePath = tab.href.split("?")[0];
@@ -26,8 +27,10 @@ export function TabBar() {
           <Link
             key={tab.href}
             href={tab.href}
-            className={`flex min-h-12 flex-1 items-center justify-center text-sm font-medium ${
-              active ? "text-black dark:text-white" : "text-black/50 dark:text-white/50"
+            className={`flex min-h-11 flex-1 items-center justify-center rounded-xl text-xs font-bold ${
+              active
+                ? `${styles.chunky} ${styles.cGreen}`
+                : "text-[var(--ink-soft)]"
             }`}
           >
             {tab.label}

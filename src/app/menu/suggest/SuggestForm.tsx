@@ -8,6 +8,7 @@ import {
   type SuggestedDay,
 } from "@/lib/suggest-actions";
 import { RecipePickerSheet } from "@/app/_components/RecipePickerSheet";
+import styles from "@/app/_components/kondate-theme.module.css";
 
 function today(): string {
   const d = new Date();
@@ -77,7 +78,7 @@ export function SuggestForm({
     return (
       <div className="space-y-4">
         <div className="space-y-2">
-          <label className="block text-sm font-medium" htmlFor="start-date">
+          <label className="block text-sm font-bold" htmlFor="start-date">
             開始日
           </label>
           <input
@@ -85,12 +86,12 @@ export function SuggestForm({
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="h-11 rounded-lg border border-black/20 px-3 text-base dark:border-white/20 dark:bg-transparent"
+            className={`${styles.searchInput} h-11 px-3 text-base`}
           />
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium" htmlFor="extra-instruction">
+          <label className="block text-sm font-bold" htmlFor="extra-instruction">
             リクエスト（任意）
           </label>
           <textarea
@@ -100,19 +101,19 @@ export function SuggestForm({
             rows={3}
             maxLength={500}
             placeholder="例: 今週は野菜多めで。金曜は来客があるので豪華に。麺類は避けて。"
-            className="w-full rounded-lg border border-black/20 px-3 py-2 text-base dark:border-white/20 dark:bg-transparent"
+            className={`${styles.searchInput} w-full px-3 py-2 text-base`}
           />
-          <p className="text-xs text-black/50 dark:text-white/50">
+          <p className="text-xs text-[var(--ink-soft)]">
             AIは「肉と魚を偏らせない」「最近作ったものを避ける」「平日は時短・週末は手の込んだもの」を基本方針にする。ここに書いた要望はそれより優先される。
           </p>
         </div>
 
-        {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+        {error && <p className={`${styles.dangerLink} text-sm`}>{error}</p>}
         <button
           type="button"
           onClick={handleSuggest}
           disabled={pending}
-          className="h-12 w-full rounded-lg bg-black text-base font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
+          className={`${styles.chunky} ${styles.cOrange} h-12 w-full text-base disabled:opacity-50`}
         >
           {pending ? "提案中…" : "1週間分を提案"}
         </button>
@@ -124,21 +125,21 @@ export function SuggestForm({
     <div className="space-y-4">
       <ul className="space-y-3">
         {suggestions.map((s) => (
-          <li key={s.date} className="rounded-xl border border-black/10 p-3 dark:border-white/10">
+          <li key={s.date} className={`${styles.card} p-3`}>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">
+              <span className="text-sm font-bold text-[var(--ink)]">
                 {formatDate(s.date)}（{s.weekday}）
               </span>
               <button
                 type="button"
                 onClick={() => handleRemove(s.date)}
-                className="text-xs text-red-600 dark:text-red-400"
+                className={`${styles.dangerLink} text-xs`}
               >
                 削除
               </button>
             </div>
-            <p className="mt-1 font-medium">{s.recipeTitle}</p>
-            <p className="mt-1 text-xs text-black/50 dark:text-white/50">{s.reason}</p>
+            <p className="mt-1 font-bold text-[var(--ink)]">{s.recipeTitle}</p>
+            <p className="mt-1 text-xs text-[var(--ink-soft)]">{s.reason}</p>
             <div className="mt-2">
               <RecipePickerSheet
                 recipes={pickerRecipes}
@@ -151,18 +152,18 @@ export function SuggestForm({
       </ul>
 
       {suggestions.length === 0 && (
-        <p className="text-center text-sm text-black/50 dark:text-white/50">
+        <p className="text-center text-sm text-[var(--ink-soft)]">
           全て削除された。提案をやり直すか、カレンダーから手動で配置してほしい。
         </p>
       )}
 
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className={`${styles.dangerLink} text-sm`}>{error}</p>}
 
       <div className="flex gap-2">
         <button
           type="button"
           onClick={() => setSuggestions(null)}
-          className="h-12 flex-1 rounded-lg border border-black/20 text-sm font-medium dark:border-white/20"
+          className={`${styles.chunky} ${styles.cCream} h-12 flex-1 text-sm`}
         >
           もう一度提案
         </button>
@@ -170,7 +171,7 @@ export function SuggestForm({
           type="button"
           onClick={handleConfirm}
           disabled={pending || suggestions.length === 0}
-          className="h-12 flex-1 rounded-lg bg-black text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
+          className={`${styles.chunky} ${styles.cGreen} h-12 flex-1 text-sm disabled:opacity-50`}
         >
           {pending ? "確定中…" : "確定してカレンダーに反映"}
         </button>

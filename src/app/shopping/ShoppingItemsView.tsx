@@ -8,6 +8,7 @@ import {
 } from "@/lib/shopping-actions";
 import type { ShoppingCategory, ShoppingItem } from "@/lib/types";
 import type { ShoppingListWithItems } from "@/lib/shopping";
+import styles from "@/app/_components/kondate-theme.module.css";
 
 const CATEGORY_ORDER: (ShoppingCategory | "未分類")[] = [
   "野菜",
@@ -64,19 +65,19 @@ export function ShoppingItemsView({ list }: { list: ShoppingListWithItems }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <label className="flex items-center gap-2 text-sm">
+        <label className="flex items-center gap-2 text-sm font-bold text-[var(--ink)]">
           <input
             type="checkbox"
             checked={showPantry}
             onChange={(e) => setShowPantry(e.target.checked)}
-            className="h-5 w-5"
+            className="h-5 w-5 accent-[var(--orange)]"
           />
           常備品も表示する
         </label>
         <button
           type="button"
           onClick={handleCopy}
-          className="h-9 rounded-lg border border-black/20 px-3 text-sm dark:border-white/20"
+          className={`${styles.chunky} ${styles.cSky} h-9 px-3 text-sm`}
         >
           {copied ? "コピーした" : "テキストでコピー"}
         </button>
@@ -87,29 +88,27 @@ export function ShoppingItemsView({ list }: { list: ShoppingListWithItems }) {
         if (group.length === 0) return null;
         return (
           <section key={category}>
-            <h2 className="mb-2 text-sm font-medium text-black/60 dark:text-white/60">
-              {category}
-            </h2>
+            <h2 className={`${styles.heading} mb-2 text-sm text-[var(--outline)]`}>{category}</h2>
             <ul className="space-y-1">
               {group.map((item) => (
                 <li
                   key={item.id}
-                  className="flex items-center gap-3 border-b border-black/5 py-2 dark:border-white/10"
+                  className="flex items-center gap-3 border-b-2 border-[var(--card-2)] py-2"
                 >
                   <input
                     type="checkbox"
                     checked={item.checked}
                     onChange={(e) => handleToggle(item.id, e.target.checked)}
-                    className="h-5 w-5 shrink-0"
+                    className="h-5 w-5 shrink-0 accent-[var(--orange)]"
                   />
                   <span
                     className={`flex-1 text-sm ${
-                      item.checked ? "text-black/30 line-through dark:text-white/30" : ""
+                      item.checked ? "text-[var(--ink-soft)] line-through" : "text-[var(--ink)]"
                     }`}
                   >
                     {item.name}
                     {item.amount != null && (
-                      <span className="ml-2 text-black/50 dark:text-white/50">
+                      <span className="ml-2 text-[var(--ink-soft)]">
                         {item.amount}
                         {item.unit ?? ""}
                       </span>
@@ -118,7 +117,7 @@ export function ShoppingItemsView({ list }: { list: ShoppingListWithItems }) {
                   <form action={deleteShoppingItemAction.bind(null, item.id)}>
                     <button
                       type="submit"
-                      className="h-8 w-8 shrink-0 rounded-lg border border-black/20 text-sm dark:border-white/20"
+                      className={`${styles.chunky} ${styles.cPink} h-8 w-8 shrink-0 text-sm`}
                       aria-label="削除"
                     >
                       ×
@@ -131,32 +130,29 @@ export function ShoppingItemsView({ list }: { list: ShoppingListWithItems }) {
         );
       })}
 
-      <section className="rounded-xl border border-dashed border-black/20 p-4 dark:border-white/20">
-        <h2 className="mb-3 text-sm font-medium">手動で追加</h2>
+      <section className={`${styles.card} border-dashed p-4`}>
+        <h2 className="mb-3 text-sm font-bold text-[var(--ink)]">手動で追加</h2>
         <form action={addManualItemAction} className="flex flex-wrap items-center gap-2">
           <input type="hidden" name="list_id" value={list.id} />
           <input
             name="name"
             placeholder="品目名"
             required
-            className="h-10 flex-1 min-w-0 rounded-lg border border-black/20 px-3 text-sm dark:border-white/20 dark:bg-transparent"
+            className={`${styles.searchInput} h-10 min-w-0 flex-1 px-3 text-sm`}
           />
           <input
             name="amount"
             type="number"
             step="0.1"
             placeholder="数量"
-            className="h-10 w-20 rounded-lg border border-black/20 px-2 text-sm dark:border-white/20 dark:bg-transparent"
+            className={`${styles.searchInput} h-10 w-20 px-2 text-sm`}
           />
           <input
             name="unit"
             placeholder="単位"
-            className="h-10 w-16 rounded-lg border border-black/20 px-2 text-sm dark:border-white/20 dark:bg-transparent"
+            className={`${styles.searchInput} h-10 w-16 px-2 text-sm`}
           />
-          <button
-            type="submit"
-            className="h-10 rounded-lg bg-black px-4 text-sm font-medium text-white dark:bg-white dark:text-black"
-          >
+          <button type="submit" className={`${styles.chunky} ${styles.cOrange} h-10 px-4 text-sm`}>
             追加
           </button>
         </form>

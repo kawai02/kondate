@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { addMenuEntryAction } from "@/lib/menu-actions";
+import styles from "@/app/_components/kondate-theme.module.css";
 
 function today(): string {
   const d = new Date();
@@ -34,7 +35,7 @@ export function AddToCalendarButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="h-11 rounded-lg border border-black/20 px-4 text-sm font-medium dark:border-white/20"
+        className={`${styles.chunky} ${styles.cSky} h-11 px-4 text-sm`}
       >
         {done ? "カレンダーに追加しました（もう1件追加）" : "＋ カレンダーに追加"}
       </button>
@@ -47,20 +48,20 @@ export function AddToCalendarButton({
         type="date"
         value={date}
         onChange={(e) => setDate(e.target.value)}
-        className="h-11 rounded-lg border border-black/20 px-3 text-sm dark:border-white/20 dark:bg-transparent"
+        className={`${styles.searchInput} h-11 px-3 text-sm`}
       />
       <button
         type="button"
         onClick={handleAdd}
         disabled={pending}
-        className="h-11 rounded-lg bg-black px-4 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
+        className={`${styles.chunky} ${styles.cOrange} h-11 px-4 text-sm disabled:opacity-50`}
       >
         {pending ? "追加中…" : "この日に追加"}
       </button>
       <button
         type="button"
         onClick={() => setOpen(false)}
-        className="h-11 rounded-lg px-3 text-sm text-black/50 dark:text-white/50"
+        className="h-11 px-3 text-sm font-bold text-[var(--ink-soft)]"
       >
         キャンセル
       </button>

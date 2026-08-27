@@ -1,0 +1,355 @@
+/*
+ * 献立ページ用の「元気でかわいい」デザイン（docs/design-mockup.html 準拠）。
+ * CSS Modulesでクラス名をハッシュ化しているため、ここで定義したスタイルは
+ * このモジュールをimportしたコンポーネント（献立ページ配下）にしか効かない。
+ * カスタムプロパティ（色）は.rootに定義し、DOM上の子孫要素へ継承させる。
+ * ダークモードは既存の仕組み（.darkクラス方式・常時非適用）に一切触れず、
+ * 単一のライト配色のみを固定で使う。
+ *
+ * 一部のコンポーネント（RecipePickerSheet等）は、まだこのデザインを
+ * 適用していない画面（/menu/suggest等）からも呼び出される。
+ * .root配下に無くても崩れないよう、var()には全てフォールバック値を付けている。
+ */
+
+.root {
+  --paper: #ffffff;
+  --paper-2: #eeebe2;
+  --ink: #4a2e2a;
+  --ink-soft: #8a6a56;
+  --outline: #5b2a2e;
+  --card: #ffffff;
+  --card-2: #ede6d4;
+
+  --green: #7cc24a;
+  --green-deep: #4d8f2c;
+  --green-soft: #e6f5d9;
+
+  --orange: #f2903d;
+  --orange-deep: #c96a22;
+  --orange-soft: #fde9d2;
+
+  --sky: #1f9dc4;
+  --sky-deep: #0f6780;
+  --sky-soft: #dff3f8;
+
+  --pink: #e8567b;
+  --pink-deep: #ab3653;
+  --pink-soft: #f8d0d9;
+
+  --font-heading: "Mochiy Pop One", "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+  --font-body: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+
+  background: var(--paper, #fff);
+  color: var(--ink, #4a2e2a);
+  font-family: var(--font-body, sans-serif);
+  -webkit-font-smoothing: antialiased;
+}
+
+.heading {
+  font-family: var(--font-heading, sans-serif);
+}
+
+/* ---------- チャンキーボタン ---------- */
+
+.chunky {
+  border: 2.5px solid var(--outline, #5b2a2e);
+  border-radius: 14px;
+  box-shadow: 0 4px 0 var(--bevel, var(--outline, #5b2a2e));
+  font-family: var(--font-heading, sans-serif);
+  color: #fff8ea;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: transform 0.05s ease;
+}
+
+.chunky:active:not(:disabled) {
+  box-shadow: 0 1.5px 0 var(--bevel, var(--outline, #5b2a2e));
+  transform: translateY(2.5px);
+}
+
+.chunky:disabled {
+  opacity: 0.45;
+  box-shadow: 0 1.5px 0 var(--bevel, var(--outline, #5b2a2e));
+  transform: translateY(2.5px);
+}
+
+.cGreen { background: linear-gradient(to bottom, #93d968, var(--green, #7cc24a)); --bevel: var(--green-deep, #4d8f2c); }
+.cOrange { background: linear-gradient(to bottom, #f7ac68, var(--orange, #f2903d)); --bevel: var(--orange-deep, #c96a22); }
+.cSky { background: linear-gradient(to bottom, #57bcda, var(--sky, #1f9dc4)); --bevel: var(--sky-deep, #0f6780); }
+.cPink { background: linear-gradient(to bottom, #f0839e, var(--pink, #e8567b)); --bevel: var(--pink-deep, #ab3653); }
+.cCream {
+  background: var(--card, #fff);
+  color: var(--ink, #4a2e2a);
+  --bevel: var(--paper-2, #eeebe2);
+}
+
+/* ---------- カード共通 ---------- */
+
+.card {
+  background: var(--card, #fff);
+  border: 3px solid var(--outline, #5b2a2e);
+  border-radius: 22px;
+  box-shadow: 0 5px 0 var(--paper-2, #eeebe2);
+}
+
+/* ---------- モーダルダイアログ（レシピ選択） ---------- */
+
+.dialogOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(74, 46, 42, 0.4);
+}
+
+.dialogPanel {
+  border-radius: 22px 22px 0 0;
+}
+
+@media (min-width: 640px) {
+  .dialogOverlay {
+    align-items: center;
+  }
+  .dialogPanel {
+    max-width: 28rem;
+    border-radius: 22px;
+  }
+}
+
+/* ---------- ヘッダー・マスコット ---------- */
+
+.appHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.appTitle {
+  padding: 8px 18px;
+  font-size: 19px;
+}
+
+.headerLinks {
+  display: flex;
+  gap: 6px;
+}
+
+.mascotRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mascotImg {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2.5px solid var(--outline, #5b2a2e);
+  background: var(--card-2, #ede6d4);
+}
+
+.bubble {
+  background: var(--card, #fff);
+  border: 2.5px solid var(--outline, #5b2a2e);
+  border-radius: 14px;
+  padding: 8px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+/* ---------- 切り替え・週送り ---------- */
+
+.viewToggle {
+  display: flex;
+  gap: 8px;
+}
+
+.weekNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+}
+
+.weekNavSide {
+  color: var(--ink, #4a2e2a);
+  font-weight: 700;
+  font-size: 12.5px;
+}
+
+/* ---------- 日付カード ---------- */
+
+.dayCard {
+  overflow: hidden;
+}
+
+.dayHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  font-family: var(--font-heading, sans-serif);
+  font-size: 13px;
+  color: #fff8ea;
+  background: linear-gradient(to bottom, #57bcda, var(--sky, #1f9dc4));
+  border-bottom: 3px solid var(--outline, #5b2a2e);
+}
+
+.dayHeadToday {
+  background: linear-gradient(to bottom, #f7ac68, var(--orange, #f2903d));
+}
+
+.todayFlag {
+  background: var(--outline, #5b2a2e);
+  color: var(--card-2, #ede6d4);
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-family: var(--font-body, sans-serif);
+}
+
+/* ---------- 献立エントリ ---------- */
+
+.entry {
+  background: transparent;
+}
+
+.entryTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink, #4a2e2a);
+}
+
+.entryMetaTag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1.6px solid var(--outline, #5b2a2e);
+  background: var(--card-2, #ede6d4);
+  color: var(--ink-soft, #8a6a56);
+}
+
+.addEntry {
+  border: 2.5px dashed var(--ink-soft, #8a6a56);
+  background: none;
+  color: var(--ink-soft, #8a6a56);
+  font-weight: 700;
+  font-family: var(--font-body, sans-serif);
+  border-radius: 12px;
+}
+
+/* ---------- タグチップ・検索 ---------- */
+
+.tagChip {
+  border: 1.8px solid var(--outline, #5b2a2e);
+  background: var(--card, #fff);
+  color: var(--ink-soft, #8a6a56);
+  font-weight: 700;
+  border-radius: 999px;
+}
+
+.tagChipActive {
+  background: linear-gradient(to bottom, #93d968, var(--green, #7cc24a));
+  color: #fff8ea;
+  border-color: var(--outline, #5b2a2e);
+}
+
+.searchInput {
+  border: 2.5px solid var(--card-2, #ede6d4);
+  border-radius: 12px;
+  background: var(--paper, #fff);
+  color: var(--ink, #4a2e2a);
+  font-family: var(--font-body, sans-serif);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--sky, #1f9dc4);
+}
+
+/* ---------- 月表示グリッド ---------- */
+
+.monthCell {
+  border: 2.5px solid var(--card-2, #ede6d4);
+  border-radius: 12px;
+  background: var(--card, #fff);
+}
+
+.monthCellToday {
+  border-color: var(--orange, #f2903d);
+}
+
+.monthCellSelected {
+  border-color: var(--outline, #5b2a2e);
+}
+
+.monthCellDragOver {
+  border-color: var(--sky, #1f9dc4);
+  background: var(--sky-soft, #dff3f8);
+}
+
+.monthDateBadge {
+  color: var(--ink-soft, #8a6a56);
+  font-weight: 700;
+}
+
+.monthDateBadgeToday {
+  background: linear-gradient(to bottom, #f7ac68, var(--orange, #f2903d));
+  color: #fff8ea;
+  border-radius: 999px;
+}
+
+.monthEntryChip {
+  background: var(--card-2, #ede6d4);
+  color: var(--ink, #4a2e2a);
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+/* ---------- ページ共通パーツ ---------- */
+
+.backLink {
+  color: var(--ink-soft, #8a6a56);
+  font-weight: 700;
+}
+
+.dangerLink {
+  color: var(--pink-deep, #ab3653);
+  font-weight: 700;
+}
+
+.noticeCard {
+  border: 2.5px solid var(--orange, #f2903d);
+  background: var(--orange-soft, #fde9d2);
+  color: var(--ink, #4a2e2a);
+  border-radius: 14px;
+}
+
+.embedFrame {
+  border: 3px solid var(--outline, #5b2a2e);
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.linkCard {
+  background: var(--card, #fff);
+  border: 3px solid var(--outline, #5b2a2e);
+  border-radius: 18px;
+  box-shadow: 0 4px 0 var(--paper-2, #eeebe2);
+}
+
+.resultCard {
+  border: 2.5px solid var(--green, #7cc24a);
+  background: var(--green-soft, #e6f5d9);
+  border-radius: 14px;
+}

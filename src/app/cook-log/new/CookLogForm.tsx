@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { createCookingLogAction } from "@/lib/cooking-log-actions";
 import { resizeImage } from "@/lib/resize-image";
+import styles from "@/app/_components/kondate-theme.module.css";
 
 export function CookLogForm({
   recipeId,
@@ -60,27 +61,19 @@ export function CookLogForm({
   return (
     <div className="space-y-6">
       <section className="space-y-2">
-        <h2 className="text-sm font-medium">評価</h2>
+        <h2 className="text-sm font-bold">評価</h2>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={() => setRating(rating === "good" ? null : "good")}
-            className={`h-11 flex-1 rounded-lg border text-sm font-medium ${
-              rating === "good"
-                ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                : "border-black/20 dark:border-white/20"
-            }`}
+            className={`${styles.chunky} ${rating === "good" ? styles.cGreen : styles.cCream} h-11 flex-1 text-sm`}
           >
             😋 おいしかった
           </button>
           <button
             type="button"
             onClick={() => setRating(rating === "bad" ? null : "bad")}
-            className={`h-11 flex-1 rounded-lg border text-sm font-medium ${
-              rating === "bad"
-                ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                : "border-black/20 dark:border-white/20"
-            }`}
+            className={`${styles.chunky} ${rating === "bad" ? styles.cPink : styles.cCream} h-11 flex-1 text-sm`}
           >
             🙁 イマイチ
           </button>
@@ -88,7 +81,7 @@ export function CookLogForm({
       </section>
 
       <section className="space-y-2">
-        <label className="block text-sm font-medium" htmlFor="comment">
+        <label className="block text-sm font-bold" htmlFor="comment">
           コメント
         </label>
         <textarea
@@ -97,12 +90,12 @@ export function CookLogForm({
           onChange={(e) => setComment(e.target.value)}
           rows={4}
           placeholder="前回は塩辛かったので今回は控えめに、など"
-          className="w-full rounded-lg border border-black/20 px-3 py-2 text-base dark:border-white/20 dark:bg-transparent"
+          className={`${styles.searchInput} w-full px-3 py-2 text-base`}
         />
       </section>
 
       <section className="space-y-2">
-        <label className="block text-sm font-medium" htmlFor="photo">
+        <label className="block text-sm font-bold" htmlFor="photo">
           完成写真（任意）
         </label>
         <input
@@ -115,12 +108,16 @@ export function CookLogForm({
         />
         {photoPreview && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={photoPreview} alt="" className="h-32 w-32 rounded-lg object-cover" />
+          <img
+            src={photoPreview}
+            alt=""
+            className="h-32 w-32 rounded-xl border-2 border-[var(--outline)] object-cover"
+          />
         )}
       </section>
 
       <section className="space-y-2">
-        <label className="block text-sm font-medium" htmlFor="author">
+        <label className="block text-sm font-bold" htmlFor="author">
           記入者
         </label>
         <input
@@ -128,7 +125,7 @@ export function CookLogForm({
           value={author}
           onChange={(e) => setAuthor(e.target.value)}
           placeholder="自分・パートナー など"
-          className="h-11 w-full rounded-lg border border-black/20 px-3 text-base dark:border-white/20 dark:bg-transparent"
+          className={`${styles.searchInput} h-11 w-full px-3 text-base`}
         />
         {existingAuthors.length > 0 && (
           <div className="flex flex-wrap gap-2">
@@ -137,7 +134,7 @@ export function CookLogForm({
                 key={a}
                 type="button"
                 onClick={() => setAuthor(a)}
-                className="h-8 rounded-full border border-black/20 px-3 text-xs dark:border-white/20"
+                className={`${styles.tagChip} h-8 px-3 text-xs`}
               >
                 {a}
               </button>
@@ -146,13 +143,13 @@ export function CookLogForm({
         )}
       </section>
 
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className={`${styles.dangerLink} text-sm`}>{error}</p>}
 
       <button
         type="button"
         onClick={handleSubmit}
         disabled={pending}
-        className="h-12 w-full rounded-lg bg-black text-base font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
+        className={`${styles.chunky} ${styles.cOrange} h-12 w-full text-base disabled:opacity-50`}
       >
         {pending ? "保存中…" : "保存"}
       </button>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import styles from "@/app/_components/kondate-theme.module.css";
 
 const OPTIONS = [
   {
@@ -22,21 +23,17 @@ export default function ImportSelectPage() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-6">
       <div className="mb-4">
-        <Link href="/recipes" className="text-sm text-black/60 dark:text-white/60">
+        <Link href="/recipes" className={`${styles.backLink} text-sm`}>
           ← レシピ一覧
         </Link>
       </div>
-      <h1 className="mb-6 text-xl font-semibold">レシピを取り込む</h1>
+      <h1 className={`${styles.heading} mb-6 text-xl text-[var(--outline)]`}>レシピを取り込む</h1>
 
       <div className="space-y-3">
         {OPTIONS.map((opt) => (
-          <Link
-            key={opt.href}
-            href={opt.href}
-            className="block rounded-xl border border-black/10 p-4 dark:border-white/10"
-          >
-            <h2 className="font-medium">{opt.title}</h2>
-            <p className="mt-1 text-sm text-black/60 dark:text-white/60">{opt.description}</p>
+          <Link key={opt.href} href={opt.href} className={`${styles.linkCard} block p-4`}>
+            <h2 className={`${styles.heading} text-sm text-[var(--outline)]`}>{opt.title}</h2>
+            <p className="mt-1 text-sm text-[var(--ink-soft)]">{opt.description}</p>
           </Link>
         ))}
       </div>

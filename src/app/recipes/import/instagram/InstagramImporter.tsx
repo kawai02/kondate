@@ -5,6 +5,7 @@ import { extractFromTextAction } from "@/lib/import-actions";
 import { createRecipeAction } from "@/lib/recipe-actions";
 import { RecipeForm } from "@/app/recipes/_components/RecipeForm";
 import type { RecipeFormValues } from "@/lib/types";
+import styles from "@/app/_components/kondate-theme.module.css";
 
 function embedUrl(url: string): string | null {
   try {
@@ -68,7 +69,7 @@ export function InstagramImporter({ existingTags }: { existingTags: string[] }) 
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <label className="block text-sm font-medium" htmlFor="instagram-url">
+        <label className="block text-sm font-bold" htmlFor="instagram-url">
           投稿のURL
         </label>
         <input
@@ -76,18 +77,18 @@ export function InstagramImporter({ existingTags }: { existingTags: string[] }) 
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://www.instagram.com/p/..."
-          className="h-12 w-full rounded-lg border border-black/20 px-4 text-base dark:border-white/20 dark:bg-transparent"
+          className={`${styles.searchInput} h-12 w-full px-4 text-base`}
         />
       </div>
 
       {embed && (
-        <div className="overflow-hidden rounded-lg border border-black/10 dark:border-white/10">
+        <div className={styles.embedFrame}>
           <iframe src={embed} className="h-[520px] w-full" title="Instagram投稿" />
         </div>
       )}
 
       <div className="space-y-2">
-        <label className="block text-sm font-medium" htmlFor="caption">
+        <label className="block text-sm font-bold" htmlFor="caption">
           キャプション（自動取得はできないため手動で貼り付けてほしい）
         </label>
         <textarea
@@ -96,17 +97,17 @@ export function InstagramImporter({ existingTags }: { existingTags: string[] }) 
           onChange={(e) => setCaption(e.target.value)}
           rows={8}
           placeholder="投稿のキャプションをコピーしてここに貼り付ける"
-          className="w-full rounded-lg border border-black/20 px-3 py-2 text-sm dark:border-white/20 dark:bg-transparent"
+          className={`${styles.searchInput} w-full px-3 py-2 text-sm`}
         />
       </div>
 
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className={`${styles.dangerLink} text-sm`}>{error}</p>}
 
       <button
         type="button"
         onClick={handleExtract}
         disabled={pending || !caption.trim()}
-        className="h-12 w-full rounded-lg bg-black text-base font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
+        className={`${styles.chunky} ${styles.cOrange} h-12 w-full text-base disabled:opacity-50`}
       >
         {pending ? "解析中…" : "AIで解析"}
       </button>
