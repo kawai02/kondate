@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import {
   fetchYouTubeMetadataAction,
@@ -18,16 +19,19 @@ export function YouTubeImporter({ existingTags }: { existingTags: string[] }) {
   const [metadata, setMetadata] = useState<YouTubeMetadata | null>(null);
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [duplicateRecipeId, setDuplicateRecipeId] = useState<string | null>(null);
   const [confidence, setConfidence] = useState<"high" | "low" | undefined>(undefined);
   const [initial, setInitial] = useState<Partial<RecipeFormValues> | null>(null);
   const [pending, startTransition] = useTransition();
 
   function handleFetchMetadata() {
     setError(null);
+    setDuplicateRecipeId(null);
     startTransition(async () => {
       const result = await fetchYouTubeMetadataAction(url);
       if (!result.ok) {
         setError(result.message);
+        setDuplicateRecipeId(result.duplicateRecipeId ?? null);
         return;
       }
       setMetadata(result.data);
@@ -98,7 +102,14 @@ export function YouTubeImporter({ existingTags }: { existingTags: string[] }) {
       </div>
 
       {error && (
-        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        <div className="text-sm text-red-600 dark:text-red-400">
+          <p>{error}</p>
+          {duplicateRecipeId && (
+            <Link href={`/recipes/${duplicateRecipeId}`} className="underline">
+              既存のレシピを見る
+            </Link>
+          )}
+        </div>
       )}
 
       {step === "metadata" && metadata && (

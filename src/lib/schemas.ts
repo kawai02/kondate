@@ -56,11 +56,13 @@ export const manualShoppingItemInputSchema = z.object({
   category: shoppingCategorySchema.nullable(),
 });
 
+export const cookingRatingSchema = z.enum(["good", "bad"]);
+
 export const cookingLogInputSchema = z.object({
   recipe_id: z.string().uuid(),
   menu_entry_id: z.string().uuid().nullable(),
   cooked_on: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  rating: z.number().int().min(1).max(5).nullable(),
+  rating: cookingRatingSchema.nullable(),
   comment: z.string().nullable(),
   photo_url: z.string().nullable(),
   author: z.string().nullable(),

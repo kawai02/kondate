@@ -94,6 +94,21 @@ export async function listAllTags(): Promise<string[]> {
   return (data ?? []) as string[];
 }
 
+// YouTube取り込み時の重複チェック用。source_urlはfetchYouTubeMetadataAction側で
+// https://www.youtube.com/watch?v=<videoId> の形に正規化してから保存・検索する。
+export async function findRecipeBySourceUrl(
+  sourceUrl: string
+): Promise<{ id: string; title: string } | null> {
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from("recipes")
+    .select("id, title")
+    .eq("source_url", sourceUrl)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
 export async function getRecipe(id: string): Promise<Recipe | null> {
   const supabase = getSupabase();
   const { data, error } = await supabase

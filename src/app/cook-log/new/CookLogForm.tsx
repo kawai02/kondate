@@ -13,7 +13,7 @@ export function CookLogForm({
   menuEntryId: string | null;
   existingAuthors: string[];
 }) {
-  const [rating, setRating] = useState<number | null>(null);
+  const [rating, setRating] = useState<"good" | "bad" | null>(null);
   const [comment, setComment] = useState("");
   const [author, setAuthor] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
@@ -42,7 +42,7 @@ export function CookLogForm({
       const formData = new FormData();
       formData.set("recipe_id", recipeId);
       if (menuEntryId) formData.set("menu_entry_id", menuEntryId);
-      if (rating != null) formData.set("rating", String(rating));
+      if (rating != null) formData.set("rating", rating);
       if (comment.trim()) formData.set("comment", comment);
       if (author.trim()) formData.set("author", author);
       if (photo) formData.set("photo", photo);
@@ -62,20 +62,28 @@ export function CookLogForm({
       <section className="space-y-2">
         <h2 className="text-sm font-medium">評価</h2>
         <div className="flex gap-2">
-          {[1, 2, 3, 4, 5].map((n) => (
-            <button
-              key={n}
-              type="button"
-              onClick={() => setRating(rating === n ? null : n)}
-              className={`h-11 w-11 rounded-lg border text-sm font-medium ${
-                rating != null && n <= rating
-                  ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                  : "border-black/20 dark:border-white/20"
-              }`}
-            >
-              {n}
-            </button>
-          ))}
+          <button
+            type="button"
+            onClick={() => setRating(rating === "good" ? null : "good")}
+            className={`h-11 flex-1 rounded-lg border text-sm font-medium ${
+              rating === "good"
+                ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
+                : "border-black/20 dark:border-white/20"
+            }`}
+          >
+            😋 おいしかった
+          </button>
+          <button
+            type="button"
+            onClick={() => setRating(rating === "bad" ? null : "bad")}
+            className={`h-11 flex-1 rounded-lg border text-sm font-medium ${
+              rating === "bad"
+                ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
+                : "border-black/20 dark:border-white/20"
+            }`}
+          >
+            🙁 イマイチ
+          </button>
         </div>
       </section>
 

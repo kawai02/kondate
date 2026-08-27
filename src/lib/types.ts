@@ -64,12 +64,14 @@ export type RecipeSummary = Pick<
   "id" | "title" | "tags" | "cook_time_min" | "thumbnail_url" | "is_planned" | "created_at"
 >;
 
+export type CookingRating = "good" | "bad";
+
 export type CookingLog = {
   id: string;
   recipe_id: string;
   menu_entry_id: string | null;
   cooked_on: string;
-  rating: number | null;
+  rating: CookingRating | null;
   comment: string | null;
   photo_url: string | null;
   author: string | null;
@@ -102,7 +104,7 @@ export type CookingLogInput = {
   recipe_id: string;
   menu_entry_id: string | null;
   cooked_on: string;
-  rating: number | null;
+  rating: CookingRating | null;
   comment: string | null;
   photo_url: string | null;
   author: string | null;

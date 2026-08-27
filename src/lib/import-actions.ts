@@ -4,6 +4,7 @@ import { requireSession } from "@/lib/require-session";
 import { parseYouTubeVideoId, fetchVideoSnippet } from "@/lib/youtube";
 import { uploadImageFromUrl, uploadImageBuffer } from "@/lib/storage";
 import { extractRecipe, GeminiExtractionError } from "@/lib/gemini";
+import { findRecipeBySourceUrl } from "@/lib/recipes";
 import type { GeminiRecipeOutput } from "@/lib/schemas";
 
 type ActionResult<T> = { ok: true; data: T } | { ok: false; message: string };
@@ -15,14 +16,30 @@ export type YouTubeMetadata = {
   sourceUrl: string;
 };
 
+export type FetchYouTubeMetadataResult =
+  | { ok: true; data: YouTubeMetadata }
+  | { ok: false; message: string; duplicateRecipeId?: string };
+
 export async function fetchYouTubeMetadataAction(
   url: string
-): Promise<ActionResult<YouTubeMetadata>> {
+): Promise<FetchYouTubeMetadataResult> {
   await requireSession();
 
   const videoId = parseYouTubeVideoId(url);
   if (!videoId) {
     return { ok: false, message: "YouTubeのURLとして認識できなかった" };
+  }
+
+  const sourceUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+  // 同じ動画を二重に取り込まないよう、YouTube APIを叩く前にチェックする。
+  const existing = await findRecipeBySourceUrl(sourceUrl);
+  if (existing) {
+    return {
+      ok: false,
+      message: `この動画は既に取り込み済み（「${existing.title}」）`,
+      duplicateRecipeId: existing.id,
+    };
   }
 
   try {
@@ -35,7 +52,7 @@ export async function fetchYouTubeMetadataAction(
         title: snippet.title,
         description: snippet.description,
         thumbnailUrl,
-        sourceUrl: `https://www.youtube.com/watch?v=${videoId}`,
+        sourceUrl,
       },
     };
   } catch (err) {

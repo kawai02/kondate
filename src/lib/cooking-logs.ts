@@ -25,6 +25,12 @@ export async function createCookingLog(input: CookingLogInput): Promise<CookingL
   return data as CookingLog;
 }
 
+export async function deleteCookingLog(id: string): Promise<void> {
+  const supabase = getSupabase();
+  const { error } = await supabase.from("cooking_logs").delete().eq("id", id);
+  if (error) throw error;
+}
+
 // 感想記録の「記入者」欄で、過去に使ったラベルをチップとしてサジェストするための一覧。
 export async function listAuthors(): Promise<string[]> {
   const supabase = getSupabase();

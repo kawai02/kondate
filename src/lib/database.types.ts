@@ -1,4 +1,4 @@
-import type { Ingredient, MealType, SourceType, Step } from "@/lib/types";
+import type { CookingRating, Ingredient, MealType, SourceType, Step } from "@/lib/types";
 
 type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
@@ -107,7 +107,7 @@ export type Database = {
           recipe_id: string;
           menu_entry_id: string | null;
           cooked_on: string;
-          rating: number | null;
+          rating: CookingRating | null;
           comment: string | null;
           photo_url: string | null;
           author: string | null;
@@ -118,7 +118,7 @@ export type Database = {
           recipe_id: string;
           menu_entry_id?: string | null;
           cooked_on: string;
-          rating?: number | null;
+          rating?: CookingRating | null;
           comment?: string | null;
           photo_url?: string | null;
           author?: string | null;

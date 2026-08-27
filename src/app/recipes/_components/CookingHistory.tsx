@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listCookingLogs } from "@/lib/cooking-logs";
+import { deleteCookingLogAction } from "@/lib/cooking-log-actions";
 
 function formatDate(iso: string): string {
   const [, m, d] = iso.split("-");
@@ -37,9 +38,20 @@ export async function CookingHistory({ recipeId }: { recipeId: string }) {
             <li key={log.id} className="rounded-lg border border-black/10 p-3 dark:border-white/10">
               <div className="flex items-center justify-between text-sm">
                 <span className="font-medium">{formatDate(log.cooked_on)}</span>
-                {log.rating != null && (
-                  <span aria-label={`評価 ${log.rating}`}>{"★".repeat(log.rating)}</span>
-                )}
+                <div className="flex items-center gap-2">
+                  {log.rating != null && (
+                    <span>{log.rating === "good" ? "😋 おいしかった" : "🙁 イマイチ"}</span>
+                  )}
+                  <form action={deleteCookingLogAction.bind(null, log.id, recipeId)}>
+                    <button
+                      type="submit"
+                      className="text-xs text-red-600 dark:text-red-400"
+                      aria-label="削除"
+                    >
+                      削除
+                    </button>
+                  </form>
+                </div>
               </div>
               {log.comment && (
                 <p className="mt-1 whitespace-pre-wrap text-sm text-black/70 dark:text-white/70">

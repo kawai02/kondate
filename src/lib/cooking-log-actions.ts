@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireSession } from "@/lib/require-session";
 import { cookingLogInputSchema } from "@/lib/schemas";
-import { createCookingLog } from "@/lib/cooking-logs";
+import { createCookingLog, deleteCookingLog } from "@/lib/cooking-logs";
 import { uploadImageBuffer } from "@/lib/storage";
 
 export async function createCookingLogAction(formData: FormData) {
@@ -32,7 +32,7 @@ export async function createCookingLogAction(formData: FormData) {
     recipe_id: recipeId,
     menu_entry_id: menuEntryIdRaw ? String(menuEntryIdRaw) : null,
     cooked_on: cookedOn,
-    rating: ratingRaw ? Number(ratingRaw) : null,
+    rating: ratingRaw ? String(ratingRaw) : null,
     comment: commentRaw ? String(commentRaw) : null,
     photo_url: photoUrl,
     author: authorRaw ? String(authorRaw) : null,
@@ -41,4 +41,10 @@ export async function createCookingLogAction(formData: FormData) {
   await createCookingLog(input);
   revalidatePath(`/recipes/${recipeId}`);
   redirect(`/recipes/${recipeId}`);
+}
+
+export async function deleteCookingLogAction(id: string, recipeId: string) {
+  await requireSession();
+  await deleteCookingLog(id);
+  revalidatePath(`/recipes/${recipeId}`);
 }
