@@ -27,6 +27,18 @@ export async function uploadImageBuffer(
   return data.publicUrl;
 }
 
+// 回転などで画像を差し替えたとき、古いオブジェクトをStorageから消す。
+// 自前バケットのpublic URLのみ対象（YouTube等の外部URLは無視）。
+export async function deleteImageByUrl(url: string): Promise<void> {
+  const marker = `/storage/v1/object/public/${BUCKET}/`;
+  const idx = url.indexOf(marker);
+  if (idx === -1) return;
+  const path = url.slice(idx + marker.length);
+  if (!path) return;
+  const supabase = getSupabase();
+  await supabase.storage.from(BUCKET).remove([path]);
+}
+
 export async function uploadImageFromUrl(url: string): Promise<string> {
   const res = await fetch(url);
   if (!res.ok) {

@@ -3,7 +3,10 @@
 // アップロード前に長辺1280px・JPEG品質0.75まで縮小する。
 // 写真取り込み（recipes/import/photo）と感想記録の完成写真アップロードで共用する。
 export async function resizeImage(file: File): Promise<File> {
-  const bitmap = await createImageBitmap(file);
+  // スマホ写真はEXIFのorientationで「横向き」として保存されることが多い。
+  // imageOrientation: "from-image" でEXIFの回転をピクセルに焼き込んでから縮小し、
+  // 取り込み後は常に正しい向きで表示されるようにする。
+  const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
   const maxSide = 1280;
   const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
   const width = Math.round(bitmap.width * scale);

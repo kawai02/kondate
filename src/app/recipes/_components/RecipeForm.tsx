@@ -1,7 +1,9 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useState, useTransition } from "react";
 import { INITIAL_TAGS } from "@/lib/tags";
+import { rotateImage90 } from "@/lib/rotate-image";
+import { uploadRotatedImageAction } from "@/lib/import-actions";
 import type { Ingredient, RecipeFormValues, SourceType, Step } from "@/lib/types";
 import styles from "@/app/_components/kondate-theme.module.css";
 
@@ -30,6 +32,35 @@ export function RecipeForm({ action, initial, existingTags, confidence }: Props)
   );
   const [tags, setTags] = useState<string[]>(initial?.tags ?? []);
   const [customTag, setCustomTag] = useState("");
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(
+    initial?.thumbnail_url ?? null
+  );
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [rotating, startRotate] = useTransition();
+
+  function handleRotate() {
+    if (!thumbnailUrl || rotating) return;
+    setImageError(null);
+    startRotate(async () => {
+      try {
+        const res = await fetch(thumbnailUrl);
+        if (!res.ok) throw new Error("fetch failed");
+        const rotated = await rotateImage90(await res.blob());
+
+        const formData = new FormData();
+        formData.append("image", rotated);
+        formData.append("old_url", thumbnailUrl);
+        const result = await uploadRotatedImageAction(formData);
+        if (!result.ok) {
+          setImageError(result.message);
+          return;
+        }
+        setThumbnailUrl(result.data.url);
+      } catch {
+        setImageError("画像の回転に失敗した");
+      }
+    });
+  }
 
   const sourceType: SourceType = initial?.source_type ?? "manual";
 
@@ -73,7 +104,7 @@ export function RecipeForm({ action, initial, existingTags, confidence }: Props)
     <form action={action} id={formId} className="space-y-6 pb-24">
       <input type="hidden" name="source_type" value={sourceType} />
       <input type="hidden" name="source_url" value={initial?.source_url ?? ""} />
-      <input type="hidden" name="thumbnail_url" value={initial?.thumbnail_url ?? ""} />
+      <input type="hidden" name="thumbnail_url" value={thumbnailUrl ?? ""} />
       <input type="hidden" name="raw_text" value={initial?.raw_text ?? ""} />
       <input type="hidden" name="tags" value={tags.join(",")} />
       <input
@@ -91,6 +122,29 @@ export function RecipeForm({ action, initial, existingTags, confidence }: Props)
         <div className={`${styles.noticeCard} px-4 py-3 text-sm`}>
           AIによる抽出の精度が低い可能性がある。材料・手順を確認・修正してから保存してほしい。
         </div>
+      )}
+
+      {thumbnailUrl && (
+        <section className="space-y-2">
+          <h2 className="text-sm font-bold">写真</h2>
+          <div className="overflow-hidden rounded-xl border-2 border-[var(--outline)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={thumbnailUrl}
+              alt=""
+              className="max-h-72 w-full bg-[var(--card-2)] object-contain"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={handleRotate}
+            disabled={rotating}
+            className={`${styles.chunky} ${styles.cCream} h-10 px-4 text-sm disabled:opacity-50`}
+          >
+            {rotating ? "回転中…" : "↻ 90°回転"}
+          </button>
+          {imageError && <p className={`${styles.dangerLink} text-sm`}>{imageError}</p>}
+        </section>
       )}
 
       <section className="space-y-2">

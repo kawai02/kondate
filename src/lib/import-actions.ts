@@ -2,7 +2,7 @@
 
 import { requireSession } from "@/lib/require-session";
 import { parseYouTubeVideoId, fetchVideoSnippet } from "@/lib/youtube";
-import { uploadImageFromUrl, uploadImageBuffer } from "@/lib/storage";
+import { uploadImageFromUrl, uploadImageBuffer, deleteImageByUrl } from "@/lib/storage";
 import { extractRecipe, GeminiExtractionError } from "@/lib/gemini";
 import { findRecipeBySourceUrl } from "@/lib/recipes";
 import type { GeminiRecipeOutput } from "@/lib/schemas";
@@ -60,6 +60,31 @@ export async function fetchYouTubeMetadataAction(
       ok: false,
       message: err instanceof Error ? err.message : "取得に失敗した",
     };
+  }
+}
+
+// クライアントで90°回転させた画像を受け取り、Storageに保存し直して新しいURLを返す。
+// レシピ編集・取り込みプレビューの「回転」ボタンから呼ばれる。
+export async function uploadRotatedImageAction(
+  formData: FormData
+): Promise<ActionResult<{ url: string }>> {
+  await requireSession();
+
+  const file = formData.get("image");
+  if (!(file instanceof File)) {
+    return { ok: false, message: "画像が渡されていない" };
+  }
+  const oldUrl = formData.get("old_url");
+
+  try {
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const url = await uploadImageBuffer(buffer, file.type || "image/jpeg");
+    if (typeof oldUrl === "string" && oldUrl) {
+      await deleteImageByUrl(oldUrl).catch(() => {});
+    }
+    return { ok: true, data: { url } };
+  } catch {
+    return { ok: false, message: "画像の回転に失敗した" };
   }
 }
 
