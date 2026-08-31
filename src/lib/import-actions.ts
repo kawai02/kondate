@@ -2,6 +2,7 @@
 
 import { requireSession } from "@/lib/require-session";
 import { parseYouTubeVideoId, fetchVideoSnippet } from "@/lib/youtube";
+import { normalizeAmebloUrl, isBlogUrl, fetchBlogArticle } from "@/lib/ameblo";
 import { uploadImageFromUrl, uploadImageBuffer, deleteImageByUrl } from "@/lib/storage";
 import { extractRecipe, GeminiExtractionError } from "@/lib/gemini";
 import { findRecipeBySourceUrl } from "@/lib/recipes";
@@ -59,6 +60,67 @@ export async function fetchYouTubeMetadataAction(
     return {
       ok: false,
       message: err instanceof Error ? err.message : "取得に失敗した",
+    };
+  }
+}
+
+export type BlogArticleMetadata = {
+  title: string;
+  text: string;
+  thumbnailUrl: string | null;
+  sourceUrl: string;
+  isAmeblo: boolean;
+};
+
+export type FetchBlogArticleResult =
+  | { ok: true; data: BlogArticleMetadata }
+  | { ok: false; message: string; duplicateRecipeId?: string };
+
+export async function fetchBlogArticleAction(
+  url: string
+): Promise<FetchBlogArticleResult> {
+  await requireSession();
+
+  const trimmed = url.trim();
+  const canonical = normalizeAmebloUrl(trimmed);
+  if (!canonical && !isBlogUrl(trimmed)) {
+    return { ok: false, message: "ブログ記事のURLを入力してほしい" };
+  }
+  const sourceUrl = canonical ?? trimmed;
+
+  // 同じ記事を二重に取り込まないよう、取得前にチェックする。
+  const existing = await findRecipeBySourceUrl(sourceUrl);
+  if (existing) {
+    return {
+      ok: false,
+      message: `この記事は既に取り込み済み（「${existing.title}」）`,
+      duplicateRecipeId: existing.id,
+    };
+  }
+
+  try {
+    const article = await fetchBlogArticle(trimmed);
+    // 元記事が消えてもレシピが失われないよう、アイキャッチを自前のStorageに保存する。
+    // 画像は必須でないため、失敗しても取り込みは続行する。
+    let thumbnailUrl: string | null = null;
+    if (article.imageUrl) {
+      thumbnailUrl = await uploadImageFromUrl(article.imageUrl).catch(() => null);
+    }
+    return {
+      ok: true,
+      data: {
+        title: article.title,
+        text: article.text,
+        thumbnailUrl,
+        // 重複チェックに使ったURLをそのまま保存し、キーの一貫性を保つ。
+        sourceUrl,
+        isAmeblo: article.isAmeblo,
+      },
+    };
+  } catch (err) {
+    return {
+      ok: false,
+      message: err instanceof Error ? err.message : "記事を取得できなかった",
     };
   }
 }

@@ -47,6 +47,32 @@ export function SourceEmbed({ recipe }: { recipe: Recipe }) {
     }
   }
 
+  if (recipe.source_type === "blog" && recipe.source_url) {
+    return (
+      <div className="space-y-2">
+        {recipe.thumbnail_url && (
+          <div className={styles.embedFrame}>
+            <Image
+              src={recipe.thumbnail_url}
+              alt={recipe.title}
+              width={800}
+              height={450}
+              className="h-auto w-full object-cover"
+            />
+          </div>
+        )}
+        <a
+          href={recipe.source_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`${styles.backLink} text-sm`}
+        >
+          元記事を開く ↗
+        </a>
+      </div>
+    );
+  }
+
   if (recipe.thumbnail_url) {
     return (
       <div className={styles.embedFrame}>

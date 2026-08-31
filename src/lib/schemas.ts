@@ -14,7 +14,7 @@ export const stepSchema = z.object({
 
 export const recipeInputSchema = z.object({
   title: z.string().min(1, "タイトルを入力してください"),
-  source_type: z.enum(["youtube", "instagram", "photo", "manual"]),
+  source_type: z.enum(["youtube", "instagram", "photo", "manual", "blog"]),
   source_url: z.string().nullable(),
   thumbnail_url: z.string().nullable(),
   raw_text: z.string().nullable(),

@@ -17,6 +17,11 @@ const OPTIONS = [
     title: "Instagram",
     description: "投稿を埋め込み表示し、キャプションを貼り付けて抽出する",
   },
+  {
+    href: "/recipes/import/blog",
+    title: "ブログ",
+    description: "料理ブログ記事のURLを貼って、本文から材料・手順を抽出する",
+  },
 ] as const;
 
 export default function ImportSelectPage() {

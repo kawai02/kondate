@@ -10,7 +10,7 @@ export type Step = {
   text: string;
 };
 
-export type SourceType = "youtube" | "instagram" | "photo" | "manual";
+export type SourceType = "youtube" | "instagram" | "photo" | "manual" | "blog";
 
 export type Recipe = {
   id: string;
