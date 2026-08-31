@@ -79,8 +79,9 @@ function decodeEntities(s: string): string {
 export function htmlToText(html: string): string {
   return decodeEntities(
     html
-      // 関連記事カードなど、レシピ本文でない埋め込みブロックを丸ごと除去。
-      .replace(/<div class="ogpCard_root"[\s\S]*?<\/div>\s*<\/div>/gi, " ")
+      // 関連記事カード（<a class="ogpCard_link">…</a>）はレシピ本文でないので除去。
+      // ネストした <a> は無いため非貪欲マッチで安全に取り除ける。
+      .replace(/<a[^>]*\bclass="[^"]*ogpCard_link[^"]*"[\s\S]*?<\/a>/gi, " ")
       .replace(/<script[\s\S]*?<\/script>/gi, " ")
       .replace(/<style[\s\S]*?<\/style>/gi, " ")
       .replace(/<br\s*\/?>/gi, "\n")
