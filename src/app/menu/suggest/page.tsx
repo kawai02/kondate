@@ -8,7 +8,7 @@ export const maxDuration = 30;
 
 export default async function MenuSuggestPage() {
   const recipes = await listRecipeSummaries();
-  const pickerRecipes = recipes.map((r) => ({ id: r.id, title: r.title, tags: r.tags }));
+  const pickerRecipes = recipes.map((r) => ({ id: r.id, title: r.title, tags: r.tags, thumbnail_url: r.thumbnail_url }));
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-6">

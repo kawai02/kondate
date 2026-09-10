@@ -2,6 +2,7 @@
 
 import { useMemo, useOptimistic, useRef, useState, useTransition } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   addMonths,
   eachDayOfInterval,
@@ -23,7 +24,7 @@ import styles from "@/app/_components/kondate-theme.module.css";
 const WEEKDAY_LABELS = ["日", "月", "火", "水", "木", "金", "土"];
 const DND_PREFIX = "kondate";
 
-type PickerRecipe = { id: string; title: string; tags: string[] };
+type PickerRecipe = { id: string; title: string; tags: string[]; thumbnail_url: string | null };
 
 function todayISO(): string {
   const d = new Date();
@@ -178,9 +179,18 @@ export function MonthGrid({
                       e.stopPropagation();
                       e.dataTransfer.setData("text/plain", `${DND_PREFIX}:entry:${entry.id}`);
                     }}
-                    className={`${styles.monthEntryChip} truncate px-1 text-[10px]`}
+                    className={`${styles.monthEntryChip} flex items-center gap-1 px-1 text-[10px]`}
                   >
-                    {entry.recipe.title}
+                    {entry.recipe.thumbnail_url && (
+                      <Image
+                        src={entry.recipe.thumbnail_url}
+                        alt=""
+                        width={20}
+                        height={20}
+                        className="h-4 w-4 shrink-0 rounded border border-[var(--outline)] object-cover"
+                      />
+                    )}
+                    <span className="truncate">{entry.recipe.title}</span>
                   </div>
                 ))}
                 {dayEntries.length > 2 && (

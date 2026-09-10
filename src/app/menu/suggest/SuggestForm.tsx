@@ -24,7 +24,7 @@ function formatDate(iso: string): string {
 export function SuggestForm({
   pickerRecipes,
 }: {
-  pickerRecipes: { id: string; title: string; tags: string[] }[];
+  pickerRecipes: { id: string; title: string; tags: string[]; thumbnail_url: string | null }[];
 }) {
   const [startDate, setStartDate] = useState(today());
   const [extraInstruction, setExtraInstruction] = useState("");

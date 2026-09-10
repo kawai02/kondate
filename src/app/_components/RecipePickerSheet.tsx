@@ -1,12 +1,14 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import Image from "next/image";
 import styles from "@/app/_components/kondate-theme.module.css";
 
 export type PickerRecipe = {
   id: string;
   title: string;
   tags: string[];
+  thumbnail_url: string | null;
 };
 
 // モーダル本体。トップページの日別追加ボタンのように、1つのダイアログを
@@ -106,14 +108,29 @@ export function RecipePickerDialog({
                 type="button"
                 disabled={pending}
                 onClick={() => pick(r.id)}
-                className="w-full rounded-xl px-3 py-3 text-left text-sm font-bold hover:bg-[var(--card-2)] disabled:opacity-50"
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-bold hover:bg-[var(--card-2)] disabled:opacity-50"
               >
-                {r.title}
-                {r.tags.length > 0 && (
-                  <span className="ml-2 text-xs font-normal text-[var(--ink-soft)]">
-                    {r.tags.slice(0, 2).map((t) => `#${t}`).join(" ")}
-                  </span>
+                {r.thumbnail_url ? (
+                  <Image
+                    src={r.thumbnail_url}
+                    alt=""
+                    width={80}
+                    height={56}
+                    className="h-14 w-20 shrink-0 rounded-xl border-2 border-[var(--outline)] object-cover"
+                  />
+                ) : (
+                  <div className="flex h-14 w-20 shrink-0 items-center justify-center rounded-xl border-2 border-[var(--outline)] bg-[var(--card-2)] text-xl">
+                    🍽
+                  </div>
                 )}
+                <span className="min-w-0 flex-1">
+                  {r.title}
+                  {r.tags.length > 0 && (
+                    <span className="ml-2 text-xs font-normal text-[var(--ink-soft)]">
+                      {r.tags.slice(0, 2).map((t) => `#${t}`).join(" ")}
+                    </span>
+                  )}
+                </span>
               </button>
             </li>
           ))}

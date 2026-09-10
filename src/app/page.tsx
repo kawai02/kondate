@@ -69,7 +69,7 @@ export default async function CalendarPage(props: PageProps<"/">) {
       listMenuEntries(format(gridStart, "yyyy-MM-dd"), format(gridEnd, "yyyy-MM-dd")),
       listRecipeSummaries(),
     ]);
-    const pickerRecipes = recipes.map((r) => ({ id: r.id, title: r.title, tags: r.tags }));
+    const pickerRecipes = recipes.map((r) => ({ id: r.id, title: r.title, tags: r.tags, thumbnail_url: r.thumbnail_url }));
 
     return (
       <main className="mx-auto max-w-5xl px-4 py-6">
@@ -95,7 +95,7 @@ export default async function CalendarPage(props: PageProps<"/">) {
     listMenuEntries(start, end),
     listRecipeSummaries(),
   ]);
-  const pickerRecipes = recipes.map((r) => ({ id: r.id, title: r.title, tags: r.tags }));
+  const pickerRecipes = recipes.map((r) => ({ id: r.id, title: r.title, tags: r.tags, thumbnail_url: r.thumbnail_url }));
 
   const days = eachDayOfInterval({ start: startDate, end: endDate }).map((d) =>
     format(d, "yyyy-MM-dd")

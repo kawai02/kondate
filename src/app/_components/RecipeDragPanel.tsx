@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import styles from "@/app/_components/kondate-theme.module.css";
 
-type PickerRecipe = { id: string; title: string; tags: string[] };
+type PickerRecipe = { id: string; title: string; tags: string[]; thumbnail_url: string | null };
 
 // PC幅でのみ表示し、レシピを月グリッドの日付セルへドラッグできるようにするパネル。
 // タッチ端末はHTML5 Drag and Dropが効かないため、スマホでは月グリッドのセルタップ経由で配置する。
@@ -77,9 +78,22 @@ export function RecipeDragPanel({ recipes }: { recipes: PickerRecipe[] }) {
             onDragStart={(e) => {
               e.dataTransfer.setData("text/plain", `kondate:recipe:${r.id}`);
             }}
-            className="cursor-grab rounded-xl border-2 border-[var(--card-2)] bg-[var(--paper)] px-3 py-2 text-sm font-bold hover:border-[var(--outline)]"
+            className="flex cursor-grab items-center gap-2 rounded-xl border-2 border-[var(--card-2)] bg-[var(--paper)] px-2 py-1.5 text-sm font-bold hover:border-[var(--outline)]"
           >
-            {r.title}
+            {r.thumbnail_url ? (
+              <Image
+                src={r.thumbnail_url}
+                alt=""
+                width={48}
+                height={40}
+                className="h-10 w-12 shrink-0 rounded-lg border-2 border-[var(--outline)] object-cover"
+              />
+            ) : (
+              <div className="flex h-10 w-12 shrink-0 items-center justify-center rounded-lg border-2 border-[var(--outline)] bg-[var(--card-2)] text-base">
+                🍽
+              </div>
+            )}
+            <span className="min-w-0 flex-1">{r.title}</span>
           </li>
         ))}
         {filtered.length === 0 && (
